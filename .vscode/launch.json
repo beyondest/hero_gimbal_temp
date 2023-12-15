@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "openocd debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/exe/hero_gimbal.elf",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            //"preLaunchTask": "run openocd", has to run manually
+            "MIMode": "gdb",
+            "miDebuggerPath": "/home/liyuxuan/gcc-arm/bin/arm-none-eabi-gdb",
+            "miDebuggerServerAddress": "localhost:5000"
+            
+        }
+    ]
+}
+
