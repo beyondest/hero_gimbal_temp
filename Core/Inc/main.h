@@ -109,6 +109,22 @@ void Error_Handler(void);
 #define RED_GREEN_Pin GPIO_PIN_14
 #define RED_GREEN_GPIO_Port GPIOF
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
