@@ -92,6 +92,7 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
   while (1)
   {
+
   }
   /* USER CODE END NonMaskableInt_IRQn 1 */
 }
@@ -200,6 +201,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
+  
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */

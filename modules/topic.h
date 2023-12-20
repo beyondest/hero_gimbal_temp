@@ -35,8 +35,8 @@ protected:
 public:
     uint8_t topic_length=0 ;
     char topic_header=0;
-    Topic();
-    ~Topic();
+    Topic(){};
+    ~Topic(){};
     
    // virtual void decode(uint8_t* pbuffer,...);
    // virtual void encode(uint8_t* pbuffer,...);
@@ -170,6 +170,8 @@ public:
 extern TOPIC_Gimbal_Control Global_Topic_gimbal_control;
 extern TOPIC_Gimbal_Pos Global_Topic_gimbal_pos;
 extern TOPIC_Present_Time Global_Topic_Present_time;
+extern TOPIC_Present_Time Global_Topic_Syn_time;
+
 
 
 //***********************************************************C API****************************************************************

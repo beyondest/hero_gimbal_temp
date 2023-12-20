@@ -6,7 +6,7 @@
 #include "main.h"
 #include "topic.h"
 #include "logger.h"
-
+#include "bsp_tim.h"
 //***************************************************Custom Define***************************************************
 #define ROTATE_PERIOD_01MS 100
 #define EXPIRED_TIME_S 2
@@ -57,6 +57,7 @@ private:
     uint32_t Pool_memory;
     uint32_t Rotate_period_01ms;
     uint8_t Expired_time_s;
+    uint16_t Max_rotate_count;
 
 //DYNAMIC values
     uint16_t header_index=0;
@@ -64,7 +65,12 @@ private:
 
     uint8_t black_list_nums=0;
     uint8_t center_second=0;
-    uint32_t rotate_times = 0;      //for calculate center_second
+    uint32_t rotate_count = 0;      //for calculate center_second
+
+//Custom private function
+
+    bool check_if_allowed(char& topic_header);
+
 
 public:
 
@@ -75,19 +81,20 @@ public:
 
 //Init 
 
-
-    Msg_Center(uint32_t rotate_period_01ms,
+    
+               
+    Msg_Center(uint32_t max_topic_length,
                uint16_t max_topic_contain_nums,
                uint8_t max_black_list_nums,
-               uint32_t max_topic_length,
+               uint32_t rotate_period_01ms,
                uint8_t expired_time_s
                ):
     Max_topic_length(max_topic_length),
     Max_topic_contain_nums(max_topic_contain_nums),
     Max_black_list_nums(max_black_list_nums),
+    Pool_memory((uint32_t)(max_topic_contain_nums*max_topic_length)),
     Rotate_period_01ms(rotate_period_01ms),
-    Expired_time_s(expired_time_s),
-    Pool_memory((uint32_t)(max_topic_contain_nums*max_topic_length))
+    Expired_time_s(expired_time_s)
     {
         
         pmsg_pool = new uint8_t[Pool_memory];
@@ -96,6 +103,7 @@ public:
         pblack_list_pool = new uint8_t[Max_black_list_nums];
         psecond_pool = new uint8_t[Max_topic_contain_nums];
         this->init_pool();
+        this->Max_rotate_count = (uint16_t)(10*1000/this->Rotate_period_01ms);
 
     };
 
@@ -113,11 +121,11 @@ public:
 
 //Main
 
-    bool check_if_allowed(char& topic_header);
     void rotate_pool();
     SEND_STATE receive_msg(Topic* ptopic, uint8_t* tx_buffer);
     SEND_STATE send_msg(Topic* ptopic, uint8_t* rx_buffer);
-    
+
+
 };
 
 
@@ -135,7 +143,6 @@ protected:
     uint8_t* ptx_buffer;
     uint8_t* prx_buffer;
     uint8_t Max_topic_length;
-
 //Dynamic value
     Local_Data_Struct* plocal_data;
 
@@ -143,14 +150,14 @@ public:
     
 //init
     Node(Msg_Center* pcenter,
-         uint8_t Max_topic_length):
+         uint8_t Max_topic_length
+         ):
          pcenter(pcenter),
          Max_topic_length(Max_topic_length)
          {
             ptx_buffer = new uint8_t[Max_topic_length];
             prx_buffer = new uint8_t[Max_topic_length];
             plocal_data = new Local_Data_Struct[1];
-
          };
 
     ~Node()
@@ -165,33 +172,29 @@ public:
         this->T_period_ms = t_period_ms;
     };
 
-//Communication with Center
+//Main
 
+    /**
+     * Each time after publish, txbuffer will be cleaned if success
+    */
     SEND_STATE send_msg_to_center(Topic* ptopic)
     {
-        if (pcenter->Center_State == CENTER_BUSY)
+        SEND_STATE tmp_send_feedback = pcenter->receive_msg(ptopic,this->ptx_buffer);
+        if (tmp_send_feedback == SEND_SUCCESS)
         {
-            return SEND_FAILURE;
-        }
-        else
-        {
-            SEND_STATE tmp_send_feedback = pcenter->receive_msg(ptopic,this->ptx_buffer);
             this->clear_tx_buffer();
-            return tmp_send_feedback;
+            
         }
+        return tmp_send_feedback;
     };
+
 
     SEND_STATE receive_msg_from_center(Topic* ptopic)
     {
-        if (pcenter->Center_State == CENTER_BUSY)
-        {
-            return SEND_FAILURE;
-        }
-        else
-        {
-            this->clear_rx_buffer();
-            return pcenter->send_msg(ptopic,this->prx_buffer);
-        }
+        this->clear_rx_buffer();
+        SEND_STATE tmp_receive_feedback = pcenter->send_msg(ptopic,this->prx_buffer);
+
+        return tmp_receive_feedback;
     };
 
     void clear_tx_buffer()

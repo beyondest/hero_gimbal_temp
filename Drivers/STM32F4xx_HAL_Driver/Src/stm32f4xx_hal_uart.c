@@ -2364,7 +2364,7 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
   uint32_t cr3its     = READ_REG(huart->Instance->CR3);
   uint32_t errorflags = 0x00U;
   uint32_t dmarequest = 0x00U;
-
+  
   /* If no error occurs */
   errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE));
   if (errorflags == RESET)

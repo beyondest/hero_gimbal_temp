@@ -25,8 +25,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "Eigen/Dense"
-#include <cmath>
+#include "bsp_tim.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -50,12 +49,22 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t tmpu8[10] = {0,0,0,0,0,0,0,0,0,0};
+uint16_t tmpu16[10] = {0,0,0,0,0,0,0,0,0,0};
+uint32_t tmpu32[10] = {0,0,0,0,0,0,0,0,0,0};
+float tmpfloat[10] = {0,0,0,0,0,0,0,0,0,0};
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+void test()
+{
+  HAL_GPIO_TogglePin(LED_RED_GPIO_Port,LED_RED_Pin);
+}
+
 
 /* USER CODE END PFP */
 
@@ -109,28 +118,18 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-
+ // Global_tim3.add_task(test);
   /* USER CODE END 2 */
+
+  Global_tim3.add_task(test);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-    Eigen::MatrixXd A(2,2);
-    A<<2,3,
-       1,4;
-    Eigen::MatrixXd B =A.inverse();
-    B*= 25;
-    double sum = B.sum();
-   
-    if ((int)std::round(sum) == 10)
-    {
-      HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
-      
-    }
-    
-    HAL_Delay(1000);
+    HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+    HAL_Delay(5000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

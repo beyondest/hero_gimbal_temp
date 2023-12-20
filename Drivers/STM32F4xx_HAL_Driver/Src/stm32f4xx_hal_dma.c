@@ -813,7 +813,9 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
             hdma->XferHalfCpltCallback(hdma);
           }
         }
+        
         /* Current memory buffer used is Memory 1 */
+
         else
         {
           if(hdma->XferM1HalfCpltCallback != NULL)

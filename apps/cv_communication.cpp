@@ -19,14 +19,206 @@ CV_Node Global_cv_node(
 
 
 
+//******************************************************CV_Node function********************************************
 
 
 
+/**
+ * For tim to call
+*/
+void CV_Node::run()
+{
+    switch (this->cv_decode_from_uart())
+    {
+    case DATA_STATE_WRONG:
+        this->cv_usart_error_handler();
+        break;
+    case DATA_STATE_ACTION:
+        this->publish_action_data();
+    case DATA_STATE_SYN:
+        this->publish_syn_data();
+    default:
+        break;
+    }
+    this->feedback_pos_data();
+
+}
 
 
+
+void CV_Node::publish_action_data()
+{
+
+    Global_Topic_gimbal_control.encode(this->ptx_buffer,
+                                        trans_frac_float(this->plocal_data->action_data.relative_pitch),
+                                        trans_frac_float(this->plocal_data->action_data.relative_yaw),
+                                        this->plocal_data->action_data.reach_minute,
+                                        this->plocal_data->action_data.reach_second,
+                                        trans_frac_float(this->plocal_data->action_data.reach_second_frac)
+                                        );
+
+    if ((this->feedback_gimbal_control = this->send_msg_to_center(&Global_Topic_gimbal_control)) != SEND_SUCCESS)
+    {
+        this->send_to_center_error_handler();
+    }
+
+}
+
+
+void CV_Node::publish_syn_data()
+{
+
+    Global_Topic_Syn_time.encode(this->ptx_buffer,
+                                 this->plocal_data->syn_data.time_minute,
+                                 this->plocal_data->syn_data.time_second,
+                                 trans_frac_float(this->plocal_data->syn_data.time_second_frac)
+                                 );
+    
+    if ((this->feedback_syn_time = this->send_msg_to_center(&Global_Topic_Syn_time)) != SEND_SUCCESS)
+    {
+        this->send_to_center_error_handler();
+    }
+
+}
+
+/**
+ * @brief Only when subscribe Pos and Present time is both SUCCESS, then will feedback to upper PC
+ * 
+*/
+void CV_Node::feedback_pos_data()
+{
+//subscribe gimbal pos
+
+    if ((this->feedback_gimbal_pos = this->receive_msg_from_center(&Global_Topic_gimbal_pos))== SEND_SUCCESS)
+    {
+ 
+        Global_Topic_gimbal_pos.decode(this->prx_buffer,
+                                        this->tmp_cur_pitch,
+                                        this->tmp_cur_yaw
+                                        );
+        this->plocal_data->pos_data.present_pitch = trans_frac_int16(this->tmp_cur_pitch);
+        this->plocal_data->pos_data.present_yaw = trans_frac_int16(this->tmp_cur_yaw);
+    }
+    else
+    {
+        this->receive_from_center_error_handler();
+    }
+
+//subscribe present time, Only CV_node need to trans_frac_uint16 here
+    if ((this->feedback_present_time = this->receive_msg_from_center(&Global_Topic_Present_time)) == SEND_SUCCESS)
+    {
+        Global_Topic_Present_time.decode(this->prx_buffer,
+                                            this->plocal_data->pos_data.time_minute,
+                                            this->plocal_data->pos_data.time_second,
+                                            this->tmp_present_second_frac
+                                            );
+        this->plocal_data->pos_data.time_second_frac = trans_frac_uint16(this->tmp_present_second_frac);
+    }
+    else
+    {
+        this->receive_from_center_error_handler();
+    }
+    
+//send to upper pos data if everything OK
+
+    if (this->feedback_gimbal_pos == SEND_SUCCESS && this->feedback_present_time == SEND_SUCCESS)
+    {
+        this->cv_encode_to_uart();
+        this->usart->send_data();
+    }
+}
+
+
+void CV_Node::init_local_data()
+{
+// Action Data   
+    this->plocal_data->action_data.sof = 'A';
+    this->plocal_data->action_data.fire_times = -1;
+    this->plocal_data->action_data.relative_pitch = 0;
+    this->plocal_data->action_data.relative_yaw = 0;
+    this->plocal_data->action_data.reach_minute = 0;
+    this->plocal_data->action_data.reach_second = 0;
+    this->plocal_data->action_data.reach_second_frac = 0;
+    this->plocal_data->action_data.null_2byte[0] = '1' ;
+    this->plocal_data->action_data.null_2byte[1] = '2' ;
+    this->plocal_data->action_data.crc_check = 0;
+
+//Syn Data
+    this->plocal_data->syn_data.sof = 'S';
+    this->plocal_data->syn_data.time_minute = 0;
+    this->plocal_data->syn_data.time_second = 0;
+    this->plocal_data->syn_data.time_second_frac = 0;
+    set_buffer((uint8_t*)&this->plocal_data->syn_data.null_7byte,0,7);
+    this->plocal_data->syn_data.crc_check = 0;
+
+//Pos Data  
+    this->plocal_data->pos_data.sof = 'P';
+    this->plocal_data->pos_data.time_minute = 0;
+    this->plocal_data->pos_data.time_second = 0;
+    this->plocal_data->pos_data.time_second_frac = 0;
+    this->plocal_data->pos_data.present_pitch = 0;
+    this->plocal_data->pos_data.present_yaw = 0;
+    this->plocal_data->pos_data.null_3byte[0] = '1';
+    this->plocal_data->pos_data.null_3byte[1] = '2';
+    this->plocal_data->pos_data.null_3byte[2] = '3';
+    this->plocal_data->pos_data.crc_value = 0;
+}
+
+
+
+/** 
+ * buffer_size : uint8t * 16
+ * more info please see inner funciton defination
+*/
+DATA_STATE CV_Node::cv_decode_from_uart()
+{
+    uint8_t* prx_buffer = this->usart->prx_buffer;
+    CV_DATA* pcv_data_struct = this->plocal_data;
+    switch ((*prx_buffer))
+    {
+    case 'A':
+        if(check_data4_crc32(prx_buffer,ACTION_DATA_LENGTH) != CRC_RIGHT)
+        {
+            return DATA_STATE_WRONG;
+        }
+        else
+        {
+            this->receive_action_to_data(prx_buffer,&(pcv_data_struct->action_data));
+            return DATA_STATE_ACTION;
+        }
+        break;
+    case 'S':
+        if (check_data4_crc32(prx_buffer,SYN_DATA_LENGTH) != CRC_RIGHT)
+        {
+            return DATA_STATE_WRONG;
+        }
+        else
+        {
+            this->receive_syn_to_data(prx_buffer,&(pcv_data_struct->syn_data));
+            return DATA_STATE_SYN;
+        }
+        break;
+    default:
+        return DATA_STATE_WRONG;
+        break;
+    }
+}
+
+/** 
+ * buffer_size : uint8t * 16
+ * more info please see inner funciton defination
+*/
+DATA_STATE CV_Node::cv_encode_to_uart()
+{
+    //crc will add to end by this func
+    this->save_pos_data_to_buffer(&(this->plocal_data->pos_data),this->usart->ptx_buffer);
+    return DATA_STATE_POS;
+}
 
 
 //************************************************CV_UART_Protocol******************************************************
+
+
 
 /**
  * BRIEF:  Save rx_data to pout_struct if crc_value is right
@@ -43,7 +235,7 @@ CV_Node Global_cv_node(
  * NO.9(crc_value:int , '<I')   (auto add to end)     |     (return of cal_crc func)   |byte12-15  bytes 4     total 16 
  * PART_CRC: byte2-5
 */
-void receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
+void CV_Node::receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
 {
   pout->sof                 = prx_data[0];
   pout->fire_times          = prx_data[1];
@@ -69,7 +261,7 @@ void receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
  *   PART_CRC: byte1-4
  * 
 */
-void receive_syn_to_data(uint8_t *prx_data,SYN_DATA* pout)
+void CV_Node::receive_syn_to_data(uint8_t *prx_data,SYN_DATA* pout)
 {
   pout->sof = prx_data[0];
   pout->time_minute = *((uint8_t*)&prx_data[1]);
@@ -100,7 +292,7 @@ void receive_syn_to_data(uint8_t *prx_data,SYN_DATA* pout)
  * 
  * 
 */
-void save_pos_data_to_buffer(POS_DATA* pdata_to_send,uint8_t* ptx_buffer)
+void CV_Node::save_pos_data_to_buffer(POS_DATA* pdata_to_send,uint8_t* ptx_buffer)
 {
     uint16_t *pu16;
     int16_t *pi16;
@@ -133,205 +325,6 @@ void save_pos_data_to_buffer(POS_DATA* pdata_to_send,uint8_t* ptx_buffer)
     *p32 = pdata_to_send->crc_value;
   
 }
-
-
-
-
-
-
-
-
-
-//******************************************************CV_Node function*******************************************8
-
-
-
-
-
-
-
-/** 
- * buffer_size : uint8t * 16
- * more info please see inner funciton defination
-*/
-DATA_STATE CV_Node::cv_decode_from_uart()
-{
-    uint8_t* prx_buffer = this->usart->prx_buffer;
-    CV_DATA* pcv_data_struct = this->plocal_data;
-    switch ((*prx_buffer))
-    {
-    case 'A':
-        if(check_data4_crc32(prx_buffer,ACTION_DATA_LENGTH) != CRC_RIGHT)
-        {
-            return DATA_STATE_WRONG;
-        }
-        else
-        {
-            receive_action_to_data(prx_buffer,&(pcv_data_struct->action_data));
-            return DATA_STATE_ACTION;
-        }
-        break;
-    case 'S':
-        if (check_data4_crc32(prx_buffer,SYN_DATA_LENGTH) != CRC_RIGHT)
-        {
-            return DATA_STATE_WRONG;
-        }
-        else
-        {
-            receive_syn_to_data(prx_buffer,&(pcv_data_struct->syn_data));
-            return DATA_STATE_SYN;
-        }
-        break;
-    default:
-        return DATA_STATE_WRONG;
-        break;
-    }
-}
-
-/** 
- * buffer_size : uint8t * 16
- * more info please see inner funciton defination
-*/
-DATA_STATE CV_Node::cv_encode_to_uart()
-{
-    //crc will add to end by this func
-    save_pos_data_to_buffer(&(this->plocal_data->pos_data),this->usart->ptx_buffer);
-    return DATA_STATE_POS;
-}
-
-
-
-
-void CV_Node::run()
-{
-    switch (this->cv_decode_from_uart())
-    {
-    case DATA_STATE_WRONG:
-        this->cv_usart_error_handler();
-        break;
-    case DATA_STATE_ACTION:
-        this->run_action_data();
-    case DATA_STATE_SYN:
-        this->run_syn_data();
-    default:
-        break;
-    }
-}
-
-
-void CV_Node::run_action_data()
-{
-//publish gimbal control
-
-    Global_Topic_gimbal_control.encode(this->ptx_buffer,
-                                        trans_frac_float(this->plocal_data->action_data.relative_pitch),
-                                        trans_frac_float(this->plocal_data->action_data.relative_yaw),
-                                        this->plocal_data->action_data.reach_minute,
-                                        this->plocal_data->action_data.reach_second,
-                                        trans_frac_float(this->plocal_data->action_data.reach_second_frac)
-                                        );
-
-    if ((this->tp_c_feedback = this->send_msg_to_center(&Global_Topic_gimbal_control)) != SEND_SUCCESS)
-    {
-        this->send_to_center_error_handler();
-    }
-
-//subscribe gimbal pos
-
-    if ((this->tp_p_feedback = this->receive_msg_from_center(&Global_Topic_gimbal_pos))== SEND_SUCCESS)
-    {
- 
-        Global_Topic_gimbal_pos.decode(this->prx_buffer,
-                                        this->tmp_cur_pitch,
-                                        this->tmp_cur_yaw
-                                        );
-        this->plocal_data->pos_data.present_pitch = trans_frac_int16(this->tmp_cur_pitch);
-        this->plocal_data->pos_data.present_yaw = trans_frac_int16(this->tmp_cur_yaw);
-    }
-    else
-    {
-        this->receive_from_center_error_handler();
-    }
-
-//subscribe present time
-    if ((this->tp_t_feedback = this->receive_msg_from_center(&Global_Topic_Present_time)) == SEND_SUCCESS)
-    {
-        Global_Topic_Present_time.decode(this->prx_buffer,
-                                            this->plocal_data->pos_data.time_minute,
-                                            this->plocal_data->pos_data.time_second,
-                                            this->tmp_present_second_frac
-                                            );
-        this->plocal_data->pos_data.time_second_frac = trans_frac_uint16(this->tmp_present_second_frac);
-    }
-    else
-    {
-        this->receive_from_center_error_handler();
-    }
-    
-//send to upper pos data if everything OK
-
-    if (this->tp_p_feedback == SEND_SUCCESS && this->tp_t_feedback == SEND_SUCCESS)
-    {
-        this->cv_encode_to_uart();
-        this->usart->send_data();
-    }
-
-}
-
-void CV_Node::run_syn_data()
-{
-//publish syn time data
-    Global_Topic_Present_time.encode(this->prx_buffer,
-                                     this->plocal_data->syn_data.time_minute,
-                                     this->plocal_data->syn_data.time_second,
-                                     trans_frac_float(this->plocal_data->syn_data.time_second_frac)
-                                     );
-    ;
-    if ((this->tp_t_feedback = this->send_msg_to_center(&Global_Topic_Present_time)) != SEND_SUCCESS)
-    {
-        this->send_to_center_error_handler();
-    }
-
-}
-
-void CV_Node::init_local_data()
-{
-    this->plocal_data[0] =
-    {
-        .action_data =
-        {
-            .sof = 'A',
-            .fire_times = -1,
-            .relative_pitch = 0,
-            .relative_yaw = 0,
-            .reach_minute = 0,
-            .reach_second = 0,
-            .reach_second_frac = 0,
-            .crc_check = 0
-        },
-        .syn_data = 
-        {
-            .sof = 'S',
-            .time_minute = 0,
-            .time_second = 0,
-            .time_second_frac = 0,
-            .crc_check = 0
-        },
-        .pos_data = 
-        {
-            .sof ='P',
-            .time_minute = 30,
-            .time_second = 20,
-            .time_second_frac = 1234,
-            .present_pitch = -1745,
-            .present_yaw = -3400,
-            .null_3byte ="12",
-            .crc_value = 0
-        }
-    };
-}
-
-
 
 
 

@@ -81,7 +81,7 @@ typedef struct
 
 typedef struct 
 {
-    float target_angle_radians;
+    float relative_angle_radians;
     float cur_angle_radians;
     
 

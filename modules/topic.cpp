@@ -14,6 +14,7 @@ TOPIC_Gimbal_Control Global_Topic_gimbal_control('C');
 TOPIC_Gimbal_Pos Global_Topic_gimbal_pos('P');
 TOPIC_Present_Time Global_Topic_Present_time('T');
 
+TOPIC_Present_Time Global_Topic_Syn_time('S');
 
 
 

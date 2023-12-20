@@ -18,8 +18,6 @@
 
 
 
-extern Usart usart8;
-extern Usart usart7;
 
 //********************************************Custom typedef********************************************************
 typedef enum:uint8_t
@@ -97,6 +95,10 @@ extern "C"{
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 
+//******************************************************Extern value**************************************************
+
+extern Usart usart8;
+extern Usart usart7;
 
 
 #ifdef __cplusplus

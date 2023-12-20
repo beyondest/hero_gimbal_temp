@@ -4,12 +4,13 @@
 
 
 //*********************************************Global Value********************************************
+
 Msg_Center Global_msg_center(
-    ROTATE_PERIOD_01MS,
-    MAX_TOPIC_CONTAIN_NUMS,
-    MAX_BLACK_LIST_NUMS,
-    MAX_TOPIC_LENGTH,
-    EXPIRED_TIME_S
+        MAX_TOPIC_LENGTH,
+        MAX_TOPIC_CONTAIN_NUMS,
+        MAX_BLACK_LIST_NUMS,
+        ROTATE_PERIOD_01MS,
+        EXPIRED_TIME_S
 );
 
 
@@ -21,6 +22,10 @@ Msg_Center Global_msg_center(
 
 //*************************************CENTER********************************************************************************
 
+
+/**
+ * When a node wants to subscribe, call this function in node receive_msg_from_center
+*/
 SEND_STATE Msg_Center::send_msg(Topic* ptopic, uint8_t* prx_buffer)
 {
     if (this->Center_State == CENTER_BUSY)
@@ -67,6 +72,9 @@ SEND_STATE Msg_Center::send_msg(Topic* ptopic, uint8_t* prx_buffer)
     
 };
 
+/**
+ * When a node wants to publish , call this function in node send_msg_to_center
+*/
 SEND_STATE Msg_Center::receive_msg(Topic* ptopic, uint8_t* ptx_buffer)
 {
     if (this->Center_State == CENTER_BUSY)
@@ -171,14 +179,14 @@ void Msg_Center::rotate_pool()
     {
         this->Center_State = CENTER_BUSY;
 
-        //rotate and rclamp
+        //rotate and rclamp, 4 pointers add together: msg_pool_pointer, header_pool_pointer, pos_pool_pointer, time_pool_pointer
         this->buffer_pos_index+=this->Max_topic_length;
         this->header_index+=1;
         this->buffer_pos_index = RCLAMP(this->buffer_pos_index,0,Pool_memory-1);
         this->header_index = RCLAMP(this->header_index,0,this->Max_topic_contain_nums-1);
 
 
-        //check expired data and clean header only
+        //check expired data and clean header and second pool
         diff_time_s =(uint8_t)ABS((int8_t)this->psecond_pool[header_index]-(int8_t)this->center_second);
         if (diff_time_s>this->Expired_time_s)
         {
@@ -190,17 +198,22 @@ void Msg_Center::rotate_pool()
         
 
         //updata center_time if second++
-        if ((this->rotate_times++)>(uint32_t)(10*1000/this->Rotate_period_01ms))
+        if ((this->rotate_count++)>this->Max_rotate_count)
         {
+
             this->center_second++;
             this->center_second = RCLAMP(center_second,0,59);
-            this->rotate_times = 0;
+            this->rotate_count = 0;
+
         }
         this->Center_State = CENTER_IDLE;
     
     }
 
 }
+
+
+
 
 
 
