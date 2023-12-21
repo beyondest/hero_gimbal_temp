@@ -3,8 +3,8 @@
 //*************************************************Global Data defination******************************************************//
 
 
-Usart usart8(&huart8,16,16,USART_DMA);
-Usart usart7(&huart7,1,1,USART_DMA);
+Usart Global_usart8(&huart8,16,16,USART_DMA);
+Usart Global_usart7(&huart7,16,16,USART_DMA);
 
 //*******************************************************Offical Function Defination*******************************************************
 
@@ -15,23 +15,23 @@ Usart usart7(&huart7,1,1,USART_DMA);
 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-
-  if (huart == &huart8)
+  
+  if (huart == &huart7)
   {
-    if (usart8.prx_callback != nullptr)
+    if (Global_usart7.prx_callback != nullptr)
     {
-      usart8.prx_callback();
+      Global_usart7.prx_callback();
     }
-    usart8.enable_receive_data();
+    Global_usart7.enable_receive_data();
     
   }
-  else if (huart == &huart7)
+  else if (huart == &huart8)
   {
-    if (usart7.prx_callback != nullptr)
+    if (Global_usart8.prx_callback != nullptr)
     {
-      usart7.prx_callback();
+      Global_usart8.prx_callback();
     }
-    usart7.enable_receive_data();
+    Global_usart8.enable_receive_data();
   }
   else
   {
@@ -50,17 +50,17 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart == &huart7)
   {
-    if (usart7.ptx_callback != nullptr)
+    if (Global_usart7.ptx_callback != nullptr)
     {
-      usart7.ptx_callback();
+      Global_usart7.ptx_callback();
     }
     
   }
   else if (huart == &huart8)
   {
-    if (usart8.ptx_callback != nullptr)
+    if (Global_usart8.ptx_callback != nullptr)
     {
-      usart8.ptx_callback();
+      Global_usart8.ptx_callback();
     }
   }
   else
@@ -89,10 +89,6 @@ void Usart::send_data()
       {
             Error_Handler();
       }
-      else
-      {
-        this->clear_tx_buffer();
-      }
     break;
   case USART_BLOCK:
       break;
@@ -102,10 +98,11 @@ void Usart::send_data()
     break;
   }
 }
-
+/**
+ * @warning Must be called before you want to receive, once call once receive
+*/
 void Usart::enable_receive_data()
 {
-  this->clear_rx_buffer();
   switch (this->usart_mode)
   {
   case USART_DMA:

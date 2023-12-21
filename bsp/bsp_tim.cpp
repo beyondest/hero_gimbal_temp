@@ -26,8 +26,19 @@ Tim Global_tim3(TIM3_PERIOD_MS,
                 &htim3);
 
 
-
-
+Tim Global_tim5(TIM5_PERIOD_MS,
+                TIM5_CLOCK_FREQUENCY_MHZ,
+                TIM5_MAX_TASK_SUPPORT,
+                TIM5_PRESCALER,
+                TIM5_COUNT_NUMS,
+                &htim5);
+                
+Tim Global_tim7(TIM7_PERIOD_MS,
+                TIM7_CLOCK_FREQUENCY_MHZ,
+                TIM7_MAX_TASK_SUPPORT,
+                TIM7_PRESCALER,
+                TIM7_COUNT_NUMS,
+                &htim7);
 
 //******************************************************Official func**************************************************************
 
@@ -35,10 +46,53 @@ Tim Global_tim3(TIM3_PERIOD_MS,
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if (htim == &htim3)
+    if (htim == &htim1)
+    {
+        Global_tim1.elapsed_callback();
+    }
+    else if (htim == &htim2)
+    {
+        Global_tim2.elapsed_callback();
+    }
+    
+    else if (htim == &htim3)
     {
         Global_tim3.elapsed_callback();
     }
+    else if (htim == &htim4)
+    {
+        while (1)
+        {
+            /* code */
+        }
+        
+    }
+    else if (htim == &htim5)
+    {
+        Global_tim5.elapsed_callback();
+    }
+    else if (htim == &htim6)
+    {
+        while (1)
+        {
+            /* code */
+        }
+        
+    }
+    else if (htim == &htim7)
+    {
+        Global_tim7.elapsed_callback();
+    }
+    else if (htim == &htim8)
+    {
+        while (1)
+        {
+            /* code */
+        }
+        
+    }
+    
+    
 }
 
 

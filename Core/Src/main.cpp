@@ -25,7 +25,16 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+
+//BSP
 #include "bsp_tim.h"
+#include "bsp_usart.h"
+//MODULES
+//APP
+#include "msg_center.h"
+#include "gimbal_task.h"
+#include "cv_communication.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -50,9 +59,13 @@
 
 /* USER CODE BEGIN PV */
 uint8_t tmpu8[10] = {0,0,0,0,0,0,0,0,0,0};
+
 uint16_t tmpu16[10] = {0,0,0,0,0,0,0,0,0,0};
 uint32_t tmpu32[10] = {0,0,0,0,0,0,0,0,0,0};
 float tmpfloat[10] = {0,0,0,0,0,0,0,0,0,0};
+SEND_STATE tmpst[4] = {SEND_SUCCESS,SEND_SUCCESS,SEND_SUCCESS,SEND_SUCCESS};
+CV_DATA* tmpcv = &Global_cv_node.plocal_data;
+GIMBAL_DATA* tmpgim = &Global_gimbal_node.plocal_data;
 
 /* USER CODE END PV */
 
@@ -60,11 +73,15 @@ float tmpfloat[10] = {0,0,0,0,0,0,0,0,0,0};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void test()
+void led_red_blink()
 {
   HAL_GPIO_TogglePin(LED_RED_GPIO_Port,LED_RED_Pin);
-}
 
+}
+void led1_blink()
+{
+  HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
+}
 
 /* USER CODE END PFP */
 
@@ -120,16 +137,49 @@ int main(void)
   /* USER CODE BEGIN 2 */
  // Global_tim3.add_task(test);
   /* USER CODE END 2 */
+  
+  Global_usart8.enable_receive_data();
 
-  Global_tim3.add_task(test);
+  Global_tim1.add_task(msg_center_run);
+  Global_tim2.add_task(msg_center_update_second);
+  Global_tim2.add_task(gimbal_update_second);
 
+  Global_tim3.add_task(cv_run);
+  
+  Global_tim5.add_task(gimbal_run);
+
+  Global_usart8.set_tx_callback(led_red_blink);
+  Global_usart8.set_rx_callback(led1_blink);
+
+ // Global_tim7.add_task(test);
+  //center rotate
+  Global_tim1.start_task();
+  //update second
+  Global_tim2.start_task();
+  HAL_Delay(13);
+
+  //cvnode
+  Global_tim3.start_task();
+  HAL_Delay(13);
+
+  //gimbal 
+  Global_tim5.start_task();
+
+  //test
+ // Global_tim7.start_task();
+
+  *tmpcv = *tmpcv;
+  *tmpgim = *tmpgim;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
+    tmpu8[0] = 0;
+    tmpu8[1] = 0;
     HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
-    HAL_Delay(5000);
+    HAL_Delay(3000);
+    
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

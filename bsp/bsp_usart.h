@@ -56,8 +56,9 @@ public:
           tx_length(tx_length),
           huart(huart)
           {
-                prx_buffer = new uint8_t[rx_length];
-                ptx_buffer = new uint8_t[tx_length];
+                this->prx_buffer = new uint8_t[rx_length];
+                this->ptx_buffer = new uint8_t[tx_length];
+                
           };
     ~Usart()
     {
@@ -97,8 +98,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 
 //******************************************************Extern value**************************************************
 
-extern Usart usart8;
-extern Usart usart7;
+extern Usart Global_usart8;
+extern Usart Global_usart7;
 
 
 #ifdef __cplusplus

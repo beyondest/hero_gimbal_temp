@@ -8,11 +8,13 @@
 #include "logger.h"
 #include "bsp_tim.h"
 //***************************************************Custom Define***************************************************
-#define ROTATE_PERIOD_01MS 100
+#define CENTER_ROTATE_PERIOD_01MS 100
 #define EXPIRED_TIME_S 2
 #define MAX_TOPIC_CONTAIN_NUMS 1000
 #define MAX_BLACK_LIST_NUMS 5
 
+//This is a tradeoff between real-time performance and filtering criteria; the larger this value, the better the real-time performance, but the higher the likelihood of omissions
+#define MAX_CHECK_EXPIRED_DATA_RATIO_MINUS1 10
 
 
 //**********************************************Custom Typedef*****************************************************
@@ -55,9 +57,7 @@ private:
     uint16_t Max_topic_contain_nums;
     uint8_t Max_black_list_nums;
     uint32_t Pool_memory;
-    uint32_t Rotate_period_01ms;
     uint8_t Expired_time_s;
-    uint16_t Max_rotate_count;
 
 //DYNAMIC values
     uint16_t header_index=0;
@@ -65,18 +65,19 @@ private:
 
     uint8_t black_list_nums=0;
     uint8_t center_second=0;
-    uint32_t rotate_count = 0;      //for calculate center_second
 
 //Custom private function
 
     bool check_if_allowed(char& topic_header);
+    void clean_expired_data();
+    void rotate_pool();
 
 
 public:
 
 //Public flag
 
-    CENTER_STATE Center_State;
+    CENTER_STATE Center_State = CENTER_IDLE;
 
 
 //Init 
@@ -86,42 +87,18 @@ public:
     Msg_Center(uint32_t max_topic_length,
                uint16_t max_topic_contain_nums,
                uint8_t max_black_list_nums,
-               uint32_t rotate_period_01ms,
                uint8_t expired_time_s
-               ):
-    Max_topic_length(max_topic_length),
-    Max_topic_contain_nums(max_topic_contain_nums),
-    Max_black_list_nums(max_black_list_nums),
-    Pool_memory((uint32_t)(max_topic_contain_nums*max_topic_length)),
-    Rotate_period_01ms(rotate_period_01ms),
-    Expired_time_s(expired_time_s)
-    {
-        
-        pmsg_pool = new uint8_t[Pool_memory];
-        pheader_pool = new uint8_t[Max_topic_contain_nums];
-        ppos_pool = new uint32_t[Max_topic_contain_nums];
-        pblack_list_pool = new uint8_t[Max_black_list_nums];
-        psecond_pool = new uint8_t[Max_topic_contain_nums];
-        this->init_pool();
-        this->Max_rotate_count = (uint16_t)(10*1000/this->Rotate_period_01ms);
+               );
 
-    };
-
-    ~Msg_Center()
-    {
-        delete[] pmsg_pool;
-        delete[] pheader_pool;
-        delete[] ppos_pool;
-        delete[] pblack_list_pool;
-        delete[] psecond_pool;
-    };
+    ~Msg_Center();
     void init_pool();
     void set_blacklist(Topic* ptopic);
 
 
 //Main
+    void update_center_second();
+    void run();
 
-    void rotate_pool();
     SEND_STATE receive_msg(Topic* ptopic, uint8_t* tx_buffer);
     SEND_STATE send_msg(Topic* ptopic, uint8_t* rx_buffer);
 
@@ -131,7 +108,6 @@ public:
 
 //*********************************************************NODE***********************************************************
 
-template <typename Local_Data_Struct>
 class Node
 {
 protected:
@@ -144,7 +120,6 @@ protected:
     uint8_t* prx_buffer;
     uint8_t Max_topic_length;
 //Dynamic value
-    Local_Data_Struct* plocal_data;
 
 public:
     
@@ -157,14 +132,12 @@ public:
          {
             ptx_buffer = new uint8_t[Max_topic_length];
             prx_buffer = new uint8_t[Max_topic_length];
-            plocal_data = new Local_Data_Struct[1];
          };
 
     ~Node()
     {
         delete[] ptx_buffer;
         delete[] prx_buffer;
-        delete[] plocal_data;
     };
     void set_comms_period(uint32_t r_period_ms,uint32_t t_period_ms)
     {
@@ -247,6 +220,9 @@ public:
 extern "C"{
 #endif
 
+void msg_center_run();
+void msg_center_update_second();
+
 #ifdef __cplusplus
 }
 #endif
@@ -256,7 +232,6 @@ extern "C"{
 
 
 extern Msg_Center Global_msg_center;
-
 
 
 

@@ -247,7 +247,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     __HAL_LINKDMA(uartHandle,hdmatx,hdma_uart8_tx);
 
     /* UART8 interrupt Init */
-    HAL_NVIC_SetPriority(UART8_IRQn, 7, 0);
+    HAL_NVIC_SetPriority(UART8_IRQn, USART8_PREEMPT_PRIORITY, USART8_SUB_PRIORITY);
     HAL_NVIC_EnableIRQ(UART8_IRQn);
   /* USER CODE BEGIN UART8_MspInit 1 */
 

@@ -11,6 +11,12 @@
 #define ACTION_DATA_LENGTH 16
 #define SYN_DATA_LENGTH 16
 #define CV_MAX_TOPIC_LENGTH 16
+
+// once wrong count++; when equal 30 and connect, then while 1
+#define MAX_USART_DATA_WRONG_COUNT 30
+
+extern SEND_STATE tmpst[4];
+
 //*******************************************************Custom TypeDef**********************************************************
 typedef enum:uint8_t
 {
@@ -25,7 +31,7 @@ typedef enum:uint8_t
 //***************************************************Custom Function****************************************************************
 
 
-class CV_Node:public Node<CV_DATA>
+class CV_Node:public Node
 {
 private:
     
@@ -36,14 +42,17 @@ private:
     float tmp_cur_yaw=0;
     float tmp_cur_pitch=0;
     float tmp_present_second_frac=0;
-    
+
     SEND_STATE feedback_gimbal_control=SEND_SUCCESS;
     SEND_STATE feedback_gimbal_pos=SEND_SUCCESS;
     SEND_STATE feedback_syn_time=SEND_SUCCESS;
     SEND_STATE feedback_present_time = SEND_SUCCESS;
 
+    uint8_t usart_data_wrong_count = 0;
+    uint8_t connect = 0;
+
 //custom private methods
-    void publish_action_data();
+    void publish_gimbal_control();
     void publish_syn_data();
     void feedback_pos_data();
 
@@ -56,6 +65,8 @@ private:
 
 
 public:
+    CV_DATA plocal_data;
+
 
 //Init
 
@@ -65,10 +76,12 @@ public:
     Node(pcenter,max_topic_length),
     usart(usart)
     {
-       this->init_local_data();    
+        
+        this->init_local_data();    
     };
     ~CV_Node()
     {
+
     };
     void init_local_data()override;
 
@@ -76,7 +89,7 @@ public:
 
     void run()override;
 
-
+    void debug_run();
 
 
 //Error Handler
@@ -84,26 +97,53 @@ public:
 
     void send_to_center_error_handler()override
     {
+
+
+        
         while (1)
         {
-            /* code */
+            tmpst[0] = this->feedback_gimbal_control;
+            tmpst[1] = this->feedback_syn_time;
+            tmpst[2] = this->feedback_gimbal_pos;
+            tmpst[3] = this->feedback_present_time;
         }
     };
     void receive_from_center_error_handler()override
     {
+        if (this->feedback_present_time == NO_MSG)
+        {
+            return;
+        }
+        else if (this->feedback_gimbal_pos == NO_MSG)
+        {
+            return;
+        }
+        
         while (1)
         {
-            /* code */
+            tmpst[0] = this->feedback_gimbal_control;
+            tmpst[1] = this->feedback_syn_time;
+            tmpst[2] = this->feedback_gimbal_pos;
+            tmpst[3] = this->feedback_present_time;
         }
         
     }
     void cv_usart_error_handler()
     {
-        while (1)
+        if (this->usart_data_wrong_count == MAX_USART_DATA_WRONG_COUNT && connect ==1 )
         {
-            /* code */
+            this->connect = 0;
+            while (1)
+            {
+                
+            }
+            
         }
-        
+        else
+        {
+            
+            return;
+        }
     };
 
 };
@@ -119,7 +159,8 @@ public:
 extern "C"{
 #endif
 
-
+void cv_run();
+void cv_debug_run();
 
 #ifdef __cplusplus
 }

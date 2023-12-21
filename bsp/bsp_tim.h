@@ -8,26 +8,29 @@
 
 //**************************************************Custom Define*****************************************************
 
-
-#define TIM1_PERIOD_MS 1000
+//center rotater
+#define TIM1_PERIOD_MS 10
 #define TIM1_MAX_TASK_SUPPORT 4
-
-#define TIM2_PERIOD_MS 2000
+//second updater
+#define TIM2_PERIOD_MS 1000
 #define TIM2_MAX_TASK_SUPPORT 4
-
-#define TIM3_PERIOD_MS 1000
+//cv node
+#define TIM3_PERIOD_MS 500
 #define TIM3_MAX_TASK_SUPPORT 4
 
 #define TIM4_PERIOD_MS 1000
 #define TIM4_MAX_TASK_SUPPORT 4
 
-#define TIM5_PERIOD_MS 1000
+//gimbal node
+#define TIM5_PERIOD_MS 100
 #define TIM5_MAX_TASK_SUPPORT 4
+
 
 #define TIM6_PERIOD_MS 1000
 #define TIM6_MAX_TASK_SUPPORT 4
 
-#define TIM7PERIOD_MS 1000
+//for test
+#define TIM7_PERIOD_MS 2000
 #define TIM7_MAX_TASK_SUPPORT 4
 
 #define TIM8_PERIOD_MS 1000
@@ -122,6 +125,8 @@ extern Tim Global_tim1;
 
 extern Tim Global_tim2;
 extern Tim Global_tim3;
+extern Tim Global_tim5;
+extern Tim Global_tim7;
 
 
 #endif
