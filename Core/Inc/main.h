@@ -35,6 +35,12 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+typedef enum
+{
+    ACTION_SUCESS,
+    ACTION_FAILURE
+
+}ACTION_STATE;   
 
 /* USER CODE END ET */
 
@@ -56,7 +62,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MEGA 1000000
+
+
+
+#define CAN1_RX PD0
+#define CAN1_TX PD1
+
+#define CAN2_RX PB5
+#define CAN2_TX PB6
 
 
 
@@ -89,17 +102,6 @@ void Error_Handler(void);
 #define TIM8_Quantum "0_1ms"
 
 
-#define DMA_stream3 UART7_Rx
-#define DMA_stream1 UART7_Tx
-#define DMA_stream6 UART8_Rx
-#define DMA_stream0 UART8_Tx
-#define DMA_stream0_PREEMPT_PRIORITY 3
-#define DMA_stream0_SUB_PRIORITY 0
-#define DMA_stream6_PREEMPT_PRIORITY 3
-#define DMA_stream6_SUB_PRIORITY 0
-
-#define USART8_PREEMPT_PRIORITY 3
-#define USART8_SUB_PRIORITY 0
 
 
 #define LED1_Pin GPIO_PIN_1
@@ -199,7 +201,20 @@ void Error_Handler(void);
 #define TIM8_COUNT_NUMS 10000
 
 //DMA setting
+#define DMA_stream3 UART7_Rx
+#define DMA_stream1 UART7_Tx
+#define DMA_stream6 UART8_Rx
+#define DMA_stream0 UART8_Tx
+#define DMA_stream0_PREEMPT_PRIORITY 3
+#define DMA_stream0_SUB_PRIORITY 0
+#define DMA_stream6_PREEMPT_PRIORITY 3
+#define DMA_stream6_SUB_PRIORITY 0
 
+
+//Usart setting
+#define USART8_PREEMPT_PRIORITY 3
+#define USART8_SUB_PRIORITY 0
+#define USART8_PULL_MODE GPIO_PULLUP
 
 //*********************************************************TypeDef**************************************************
 typedef void (*pvoid_void_func)(void);

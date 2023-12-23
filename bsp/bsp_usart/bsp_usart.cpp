@@ -22,7 +22,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
       Global_usart7.prx_callback();
     }
-    Global_usart7.enable_receive_data();
+    Global_usart7.receive_data();
     
   }
   else if (huart == &huart8)
@@ -31,7 +31,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
       Global_usart8.prx_callback();
     }
-    Global_usart8.enable_receive_data();
+    Global_usart8.receive_data();
   }
   else
   {
@@ -87,7 +87,7 @@ void Usart::send_data()
   case USART_DMA:
       if (HAL_UART_Transmit_DMA(this->huart,this->ptx_buffer,this->tx_length) != HAL_OK)
       {
-            Error_Handler();
+        Error_Handler();
       }
     break;
   case USART_BLOCK:
@@ -98,15 +98,21 @@ void Usart::send_data()
     break;
   }
 }
+
+
 /**
  * @warning Must be called before you want to receive, once call once receive
 */
-void Usart::enable_receive_data()
+void Usart::receive_data()
 {
   switch (this->usart_mode)
   {
   case USART_DMA:
-    HAL_UART_Receive_DMA(this->huart,this->prx_buffer,this->rx_length);
+    if (HAL_UART_Receive_DMA(this->huart,this->prx_buffer,this->rx_length) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    
     break;
   case USART_IDLE:
     break;

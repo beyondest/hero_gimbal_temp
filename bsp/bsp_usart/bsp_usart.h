@@ -75,7 +75,7 @@ public:
     }
 
     void send_data();
-    void enable_receive_data();
+    void receive_data();
     void clear_rx_buffer();
     void clear_tx_buffer();
 };

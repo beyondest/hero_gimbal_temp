@@ -5,12 +5,21 @@
 
 #include "main.h"
 #include "crc.h"
+//*******************************************************Custom Define**********************************************
+
+
 
 //clamp x to be in scope(bottom, upper), difference is that rclamp is circle x from upper to bottom and from bottom to upper;
 #define CLAMP(x,bottom,upper) ((x<bottom)?(bottom):((x>upper)?(upper):(x)))
 
 //abs(x+step-upper)  or abs(x-step-bottom) must be 1, or will go wrong
 #define RCLAMP(x,bottom,upper) ((x<bottom)?(upper):((x>upper)?(bottom):(x)))
+
+
+#define PIE 3.1416
+#define MEGA 1000000
+
+
 
 //*************************************************Custom TypeDef***********************************************
 
@@ -65,10 +74,25 @@ private:
     float kp = 0;
     float ki = 0;
     float kd = 0;
+    
+    float max_p;
+    float min_p;
+    float max_i;
+    float min_i;
+    float max_d;
+    float min_d;
+
+    float max_input;
+    float min_input;
+    float max_output;
+    float min_output;
+
 
 //Dynamic value
+
     float cur_error = 0;
     float pre_error = 0;
+
     float p = 0;
     float i = 0;
     float d = 0;
@@ -79,11 +103,26 @@ public:
 
 
 
-    Pid(/* args */);
+    Pid(float kp,
+        float ki, 
+        float kd,
+        float max_p,
+        float min_p,
+        float max_i,
+        float min_i,
+        float max_d,
+        float min_d,
+        float max_input,
+        float min_input,
+        float max_output,
+        float min_output);
+
     ~Pid();
 
     float calculate(float goal, float cur_value);
+    void reset();
     
+
 };
 
 

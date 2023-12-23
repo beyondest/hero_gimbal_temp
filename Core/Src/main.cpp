@@ -138,7 +138,7 @@ int main(void)
  // Global_tim3.add_task(test);
   /* USER CODE END 2 */
   
-  Global_usart8.enable_receive_data();
+  Global_usart8.receive_data();
 
   Global_tim1.add_task(msg_center_run);
   Global_tim2.add_task(msg_center_update_second);
@@ -174,6 +174,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    
     /* USER CODE END WHILE */
     tmpu8[0] = 0;
     tmpu8[1] = 0;
