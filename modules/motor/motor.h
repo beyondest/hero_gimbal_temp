@@ -7,7 +7,7 @@
 #include "bsp_can.h"
 #include "bsp_data_struct.h"
 #include "mymath.h"
-
+#include "logger.h"
 //**************************************************Custom Define*****************************************************
 
 

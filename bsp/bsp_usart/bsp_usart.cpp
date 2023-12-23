@@ -15,7 +15,6 @@ Usart Global_usart7(&huart7,16,16,USART_DMA);
 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  
   if (huart == &huart7)
   {
     if (Global_usart7.prx_callback != nullptr)
@@ -23,7 +22,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       Global_usart7.prx_callback();
     }
     Global_usart7.receive_data();
-    
   }
   else if (huart == &huart8)
   {

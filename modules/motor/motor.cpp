@@ -1,7 +1,4 @@
 #include "motor.h"
-#include "mymath.h"
-#include "logger.h"
-#include "bsp_data_struct.h"
 
 
 GMMotor Global_pitch_motor(/*  Fixed Value  */
@@ -23,7 +20,6 @@ GMMotor Global_pitch_motor(/*  Fixed Value  */
                            &Global_pitch_radians_pid,
                            &Global_pitch_rpm_pid
                            );
-
 
 GMMotor Global_yaw_motor(  /*  Fixed Value  */ 
                            YAW_MOTOR_ID,

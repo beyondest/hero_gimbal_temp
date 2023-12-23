@@ -4,14 +4,9 @@
 //*************************************Global Value***********************************************
 
 Can Global_can1(
-                CAN1_MAIL_BOX,
-                
+                CAN1_MAIL_BOX, 
                 CAN1_FIFO,
-                &hcan1,
-                CAN1_FILTER_ID,
-                CAN1_MASK_ID,
-                CAN1_IT_TYPE,
-                CAN1_FILTER_INDEX);
+                &hcan1);
 
 
 
@@ -65,42 +60,12 @@ void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 
 Can::Can(   uint32_t mail_box,
             uint32_t rx_fifo,
-            CAN_HandleTypeDef* hcan,
-            uint32_t filter_id,
-            uint32_t mask_id,
-            uint32_t rx_it_type,
-            uint8_t filter_index):
+            CAN_HandleTypeDef* hcan):
             Mail_box(mail_box),
             Rx_fifo(rx_fifo),
             hcan(hcan)
 {
-    CAN_FilterTypeDef can_filter;
-    can_filter.SlaveStartFilterBank = GLOBAL_CAN_FILTER_SLAVE_START;
-    can_filter.FilterBank = filter_index;
-    can_filter.FilterMode = GLOBAL_CAN_FILTER_TYPE;
-    can_filter.FilterScale = GLOBAL_CAN_FILTER_SCALE;
-    //init
-    can_filter.FilterIdHigh = 0x0000;
-    can_filter.FilterIdLow = 0x0000;
-    can_filter.FilterMaskIdHigh = 0x0000;
-    can_filter.FilterMaskIdLow = 0x0000;
-
-    can_filter.FilterFIFOAssignment = this->Rx_fifo;
-    can_filter.FilterActivation = ENABLE;
-
-    can_filter.FilterIdLow = filter_id;
-    can_filter.FilterMaskIdLow = mask_id;
-    
-    if (HAL_CAN_ConfigFilter(this->hcan,&can_filter) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    
-    if (HAL_CAN_ActivateNotification(&hcan1,rx_it_type) != HAL_OK)
-    {
-        Error_Handler();
-    }
-     
+  
 }
 
 Can::~Can()

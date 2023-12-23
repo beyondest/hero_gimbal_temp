@@ -125,6 +125,7 @@ set(LINKER_FLAGS -pipe ${MCU_FLAGS}
 
 add_compile_options(-pipe ${MCU_FLAGS} -Wall -Werror -fmessage-length=0 # basic options: Warning all; Warning treated as error;force message length disabled; 
                     -ffunction-sections -fdata-sections -fno-common # optimize options ;force function sections and data sections; force no common variebles set in BSS
+                    -fstack-usage
                     )
 
 

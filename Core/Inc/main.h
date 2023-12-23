@@ -215,6 +215,25 @@ void Error_Handler(void);
 #define USART8_PREEMPT_PRIORITY 3
 #define USART8_SUB_PRIORITY 0
 #define USART8_PULL_MODE GPIO_PULLUP
+#define USART8_BAUDRATE 9600
+
+
+//Can setting 
+#define GLOBAL_CAN_FILTER_TYPE CAN_FILTERMODE_IDMASK
+#define GLOBAL_CAN_FILTER_SLAVE_START 14
+#define GLOBAL_CAN_FILTER_SCALE CAN_FILTERSCALE_16BIT
+
+//this is GM possible ID    1    2     3     4     5     6     7
+// CAN1_ID_YOU_WANT "0x205 0x206 0x207 0x208 0x209 0x20a 0x20b"
+#define CAN1_MASK_ID   0x7f0
+#define CAN1_FILTER_ID  0x200
+#define CAN1_IT_TYPE CAN_IT_RX_FIFO0_MSG_PENDING
+#define CAN1_MAIL_BOX CAN_TX_MAILBOX0
+#define CAN1_FIFO CAN_RX_FIFO0
+#define CAN1_FILTER_INDEX 0
+
+
+
 
 //*********************************************************TypeDef**************************************************
 typedef void (*pvoid_void_func)(void);

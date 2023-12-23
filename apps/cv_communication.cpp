@@ -266,7 +266,7 @@ DATA_STATE CV_Node::cv_encode_to_uart()
  * NO.4 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                  |byte6      bytes 1     total 7
  * NO.5 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                 |byte7      bytes 1     total 8
  * NO.6 (reach_target_time_second_frac.4*10000 , '<H')|     (0<=x<=10000)              |byte8-9    bytes 2     total 10 
- * NO.78 (null bytes: b'12', '<c','<c')  (auto add)   |                                |byte10-11  bytes 2     total 12
+ * NO.78(setting: b'12', '<c','<c')  (auto add)   |                                |byte10-11  bytes 2     total 12
  * NO.9(crc_value:int , '<I')   (auto add to end)     |     (return of cal_crc func)   |byte12-15  bytes 4     total 16 
  * PART_CRC: byte2-5
 */
