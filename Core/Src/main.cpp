@@ -143,9 +143,7 @@ int main(void)
   Global_tim1.add_task(msg_center_run);
   Global_tim2.add_task(msg_center_update_second);
   Global_tim2.add_task(gimbal_update_second);
-
   Global_tim3.add_task(cv_run);
-  
   Global_tim5.add_task(gimbal_run);
 
   Global_usart8.set_tx_callback(led_red_blink);
@@ -176,8 +174,6 @@ int main(void)
   {
     
     /* USER CODE END WHILE */
-    tmpu8[0] = 0;
-    tmpu8[1] = 0;
     HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
     HAL_Delay(3000);
     

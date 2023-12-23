@@ -3,9 +3,11 @@
 
 //*************************************Global Value***********************************************
 
-Can Global_can1(&hcan1,
+Can Global_can1(
                 CAN1_MAIL_BOX,
+                
                 CAN1_FIFO,
+                &hcan1,
                 CAN1_FILTER_ID,
                 CAN1_MASK_ID,
                 CAN1_IT_TYPE,
@@ -61,16 +63,16 @@ void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 //*********************************************************Custom Function********************************************
 
 
-Can::Can(   CAN_HandleTypeDef* hcan,
-            uint32_t mail_box,
+Can::Can(   uint32_t mail_box,
             uint32_t rx_fifo,
+            CAN_HandleTypeDef* hcan,
             uint32_t filter_id,
             uint32_t mask_id,
             uint32_t rx_it_type,
             uint8_t filter_index):
-            hcan(hcan),
             Mail_box(mail_box),
-            Rx_fifo(rx_fifo)
+            Rx_fifo(rx_fifo),
+            hcan(hcan)
 {
     CAN_FilterTypeDef can_filter;
     can_filter.SlaveStartFilterBank = GLOBAL_CAN_FILTER_SLAVE_START;

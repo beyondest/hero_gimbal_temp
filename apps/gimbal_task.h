@@ -8,6 +8,7 @@
 #include "msg_center.h"
 #include "mymath.h"
 #include "logger.h"
+#include "motor.h"
 
 //**************************************************Custom Define*****************************************************
 
@@ -42,6 +43,10 @@ private:
     SEND_STATE feedback_syn_time = SEND_SUCCESS;
     SEND_STATE feedback_present_time = SEND_SUCCESS;
 
+    GMMotor* ppitch_motor ;
+    GMMotor* pyaw_motor ;
+    
+
 
 //custom private methods
     void gimbal_yaw_control();
@@ -55,8 +60,13 @@ public:
 //Init
     GIMBAL_DATA plocal_data;
 
-    Gimbal_Node(Msg_Center* pcenter,uint8_t max_topic_length):
-    Node(pcenter,max_topic_length)
+    Gimbal_Node(Msg_Center* pcenter,
+                uint8_t max_topic_length,
+                GMMotor* ppitch_motor,
+                GMMotor* pyaw_motor):
+    Node(pcenter,max_topic_length),
+    ppitch_motor(ppitch_motor),
+    pyaw_motor(pyaw_motor)
     {
         this->init_local_data();
     };

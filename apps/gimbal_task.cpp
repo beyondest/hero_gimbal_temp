@@ -5,7 +5,10 @@
 //*****************************************************Global Value************************************************************
 
 
-Gimbal_Node Global_gimbal_node(&Global_msg_center,GIMBAL_MAX_TOPIC_LENGTH);
+Gimbal_Node Global_gimbal_node(&Global_msg_center,
+                                GIMBAL_MAX_TOPIC_LENGTH,
+                                &Global_pitch_motor,
+                                &Global_yaw_motor);
 
 
 void gimbal_run()

@@ -1,6 +1,6 @@
-// Table: Variable X to Degrees/Radians Conversion
+// Table: Code to Degrees/Radians Conversion
 // ---------------------------------------------
-// Variable X  |  Degrees  |  Radians
+// Code  |Degrees|  Radians
 // ---------------------------------------------
 // 113   |  5    |  0.0873
 // 226   |  10   |  0.1745

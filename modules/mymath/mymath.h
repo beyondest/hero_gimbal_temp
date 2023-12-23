@@ -8,6 +8,76 @@
 //*******************************************************Custom Define**********************************************
 
 
+#define PITCH_RADIANS_MAX 1.5708
+#define PITCH_RADIANS_MIN -1.5708
+#define PITCH_RPM_MAX     1000
+#define PITCH_RPM_MIN     -1000
+#define PITCH_MAX_SETTING_VOLTAGE 30000
+#define PITCH_MIN_SETTING_VOLTAGE -30000
+
+
+
+#define YAW_RADIANS_MAX  3.1416
+#define YAW_RADIANS_MIN  -3.1416
+#define YAW_RPM_MAX      1000
+#define YAW_RPM_MIN      -1000
+#define YAW_MAX_SETTING_VOLTAGE 30000
+#define YAW_MIN_SETTING_VOLTAGE -30000
+
+
+
+
+#define PITCH_RADIANS_PID_KP 40
+#define PITCH_RADIANS_PID_KI  3
+#define PITCH_RADIANS_PID_KD  1
+#define PITCH_RADIANS_PID_MAX_P 10000
+#define PITCH_RADIANS_PID_MIN_P -10000
+#define PITCH_RADIANS_PID_MAX_I 10000
+#define PITCH_RADIANS_PID_MIN_I -10000
+#define PITCH_RADIANS_PID_MAX_D 10000
+#define PITCH_RADIANS_PID_MIN_D -10000
+
+
+#define PITCH_RPM_KP 40
+#define PITCH_RPM_KI  3
+#define PITCH_RPM_KD  1
+#define PITCH_RPM_MAX_P 10000
+#define PITCH_RPM_MIN_P -10000
+#define PITCH_RPM_MAX_I 10000
+#define PITCH_RPM_MIN_I -10000
+#define PITCH_RPM_MAX_D 10000
+#define PITCH_RPM_MIN_D -10000
+
+
+
+#define YAW_RADIANS_PID_KP 40
+#define YAW_RADIANS_PID_KI  3
+#define YAW_RADIANS_PID_KD  1
+#define YAW_RADIANS_PID_MAX_P 10000
+#define YAW_RADIANS_PID_MIN_P -10000
+#define YAW_RADIANS_PID_MAX_I 10000
+#define YAW_RADIANS_PID_MIN_I -10000
+#define YAW_RADIANS_PID_MAX_D 10000
+#define YAW_RADIANS_PID_MIN_D -10000
+
+
+#define YAW_RPM_KP 40
+#define YAW_RPM_KI  3
+#define YAW_RPM_KD  1
+#define YAW_RPM_MAX_P 10000
+#define YAW_RPM_MIN_P -10000
+#define YAW_RPM_MAX_I 10000
+#define YAW_RPM_MIN_I -10000
+#define YAW_RPM_MAX_D 10000
+#define YAW_RPM_MIN_D -10000
+
+
+
+
+
+
+
+
 
 //clamp x to be in scope(bottom, upper), difference is that rclamp is circle x from upper to bottom and from bottom to upper;
 #define CLAMP(x,bottom,upper) ((x<bottom)?(bottom):((x>upper)?(upper):(x)))
@@ -71,9 +141,9 @@ class Pid
 {
 private:
 //Const value
-    float kp = 0;
-    float ki = 0;
-    float kd = 0;
+    float kp ;
+    float ki ;
+    float kd ;
     
     float max_p;
     float min_p;
@@ -82,8 +152,10 @@ private:
     float max_d;
     float min_d;
 
-    float max_input;
-    float min_input;
+    float max_target_value;
+    float min_target_value;
+    float max_cur_value;
+    float min_cur_value;
     float max_output;
     float min_output;
 
@@ -96,6 +168,9 @@ private:
     float p = 0;
     float i = 0;
     float d = 0;
+    float target_value = 0;
+    float cur_value = 0;
+    float output = 0;
 
 
 
@@ -112,14 +187,16 @@ public:
         float min_i,
         float max_d,
         float min_d,
-        float max_input,
-        float min_input,
+        float max_target_value,
+        float min_target_value,
+        float max_cur_value,
+        float min_cur_value,
         float max_output,
         float min_output);
 
-    ~Pid();
+    ~Pid(){};
 
-    float calculate(float goal, float cur_value);
+    float calculate(float goal, float cur);
     void reset();
     
 
@@ -141,6 +218,22 @@ extern "C"{
 }
 #endif
 
+//*****************************************************Extern Value******************************************************
+
+extern Pid Global_pitch_radians_pid;
+
+
+extern Pid Global_pitch_rpm_pid;
+
+
+
+
+
+extern Pid Global_yaw_radians_pid;
+
+                              
+extern Pid Global_yaw_rpm_pid;
+                          
 
 
 #endif

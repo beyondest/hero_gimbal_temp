@@ -44,9 +44,10 @@ public:
 
     CAN_HandleTypeDef* hcan;
 
-    Can(CAN_HandleTypeDef* hcan,
-        uint32_t mail_box,
+    Can(uint32_t mail_box,
         uint32_t rx_fifo,
+        CAN_HandleTypeDef* hcan,
+        
         uint32_t filter_id,
         uint32_t mask_id,
         uint32_t rx_it_type,
