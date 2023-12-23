@@ -129,6 +129,7 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
   can_user_init(&hcan1);
+  //fu
   /* USER CODE END 2 */
   
 
