@@ -15,6 +15,7 @@
 #define YAW_MOTOR_ID 1
 #define YAW_CODE_ZERO_OFFSET 4096
 
+
 #define YAW_MAX_CODE_VALUE 8192
 #define YAW_MIN_CODE_VALUE 0
 #define YAW_MAX_SETTING_VOLTAGE 30000
@@ -61,8 +62,12 @@
 //*****************************************************Custom TypeDef********************************************************
 
 /**
- * when MOTOR_PREPARING , radians control cmd will fail, but then it turns into run automatically(do not change motor flag on your own)
-*/
+ *  MOTOR_PREPARING : motor control cmd will not working but return success; 
+ *          This is an intermediate transitional state. 
+ *          If in debug mode, this intermediate state is approximately nonexistent. 
+ *          In no_debug mode, however, this intermediate transitional state ensures that the motor will only follow cmd after reaching the specified angle
+ * 
+ */
 typedef enum:uint8_t
 {
     MOTOR_RUNNING,
@@ -126,7 +131,7 @@ private:
     int16_t Max_torque_I;
     uint8_t Max_temperature;
 
-    float motor_reset_radians = 0;
+    float motor_start_radians = 0;
 
 //Dynamic Value
 
@@ -172,6 +177,8 @@ private:
     void check_motor_state();
     void update_setting_voltage();
     void reset();
+    void start();            
+
 
 public:
 //Const
@@ -207,14 +214,14 @@ public:
 //For Gimbal node app
 
 
-
+    ACTION_STATE get_cur_rpm(int16_t* prpm);
+    ACTION_STATE get_cur_code(int16_t* pcode);
     ACTION_STATE get_cur_radians(float* pcur_radians);
     ACTION_STATE to_radians(float target_radians, 
                            uint8_t target_time_minute,
                            uint8_t target_time_second,
                            float target_time_second_frac);
     
-    ACTION_STATE start();            
     ACTION_STATE shutdown();
 
     ACTION_STATE to_voltage(int16_t no_clamp_voltage);
@@ -274,6 +281,10 @@ public:
 #ifdef __cplusplus
 extern "C"{
 #endif
+
+void pitch_control();
+void yaw_control();
+
 
 #ifdef __cplusplus
 }

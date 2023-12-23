@@ -21,6 +21,10 @@ void gimbal_update_second()
 {
     Global_gimbal_node.update_time_second();
 }
+void gimbal_debug_run()
+{
+    Global_gimbal_node.debug_run();
+}
 
 //*******************************************************Init*******************************************
 
@@ -42,6 +46,8 @@ void Gimbal_Node::init_local_data()
 
     this->plocal_data.yaw_motor_data.cur_angle_radians = -0.2618;
     this->plocal_data.yaw_motor_data.relative_angle_radians = 0;
+
+    this->plocal_data.setting_voltage_or_rpm = 10;
 
 }
 
@@ -66,10 +72,23 @@ void Gimbal_Node::run()
     
 
     this->gimbal_pitch_control();
-    this->gimbal_yaw_control();
+    this->gimbal_yaw_control(); 
+
+}
+
+void Gimbal_Node::debug_run()
+{
+    this->publish_gimbal_pos();
+    this->publish_present_time();
+    this->subscribe_gimbal_control();
+    this->ppitch_motor->debug_flag = RPM_DEBUG;
+    
+    if (this->ppitch_motor->to_rpm(this->plocal_data.setting_voltage_or_rpm) != ACTION_SUCESS)
+    {
+        this->gimbal_control_action_wrong_error_handler();
+    }
 
     
-
 }
 
 void Gimbal_Node::update_time_second()
@@ -93,7 +112,8 @@ void Gimbal_Node::subscribe_gimbal_control()
                                            this->plocal_data.yaw_motor_data.relative_angle_radians,
                                            this->plocal_data.target_time.minute,
                                            this->plocal_data.target_time.second,
-                                           this->plocal_data.target_time.second_frac_4
+                                           this->plocal_data.target_time.second_frac_4,
+                                           this->plocal_data.setting_voltage_or_rpm
                                            );
     }
     else
@@ -162,4 +182,5 @@ void Gimbal_Node::gimbal_yaw_control()
 {
 
 }
+
 

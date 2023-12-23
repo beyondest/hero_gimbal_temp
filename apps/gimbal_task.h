@@ -79,6 +79,7 @@ public:
 //Run
 
     void run()override;
+    void debug_run();
     void update_time_second();
 //Error Handler
     void send_to_center_error_handler()override
@@ -116,6 +117,17 @@ public:
         }
         
     };
+
+    void gimbal_control_action_wrong_error_handler()
+    {
+        //this->ppitch_motor->shutdown();
+        //this->pyaw_motor->shutdown();
+        while (1)
+        {
+            /* code */
+        }
+        
+    }
 };
 
 
@@ -139,7 +151,7 @@ extern "C"{
 #endif
 
 void gimbal_run();
-
+void gimbal_debug_run();
 void gimbal_update_second();
 #ifdef __cplusplus
 }

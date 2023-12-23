@@ -78,6 +78,8 @@ public:
     void receive_data();
     void clear_rx_buffer();
     void clear_tx_buffer();
+    void start();
+    void stop();
 };
 
 

@@ -130,3 +130,21 @@ void Usart::clear_tx_buffer()
   set_buffer(this->ptx_buffer,0,(uint32_t)this->tx_length);
 }
 
+
+void Usart::start()
+{
+  this->clear_rx_buffer();
+  this->clear_tx_buffer();
+  this->receive_data();
+}
+
+
+/**
+ * Not complete, do not use it
+*/
+void Usart::stop()
+{
+  this->clear_rx_buffer();
+  this->clear_tx_buffer();
+  
+}

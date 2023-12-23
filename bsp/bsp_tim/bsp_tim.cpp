@@ -32,7 +32,14 @@ Tim Global_tim5(TIM5_PERIOD_MS,
                 TIM5_PRESCALER,
                 TIM5_COUNT_NUMS,
                 &htim5);
-                
+
+Tim Global_tim6(TIM6_PERIOD_MS,
+                TIM6_CLOCK_FREQUENCY_MHZ,
+                TIM6_MAX_TASK_SUPPORT,
+                TIM6_PRESCALER,
+                TIM6_COUNT_NUMS,
+                &htim6);
+
 Tim Global_tim7(TIM7_PERIOD_MS,
                 TIM7_CLOCK_FREQUENCY_MHZ,
                 TIM7_MAX_TASK_SUPPORT,
@@ -73,11 +80,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     else if (htim == &htim6)
     {
-        while (1)
-        {
-            /* code */
-        }
-        
+        Global_tim6.elapsed_callback();
     }
     else if (htim == &htim7)
     {

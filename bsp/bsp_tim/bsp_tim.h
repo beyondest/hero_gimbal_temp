@@ -8,6 +8,9 @@
 
 //**************************************************Custom Define*****************************************************
 
+//Notice: you must set period bigger than main.h "" period of tim
+
+
 //center rotater
 #define TIM1_PERIOD_MS 10
 #define TIM1_MAX_TASK_SUPPORT 4
@@ -25,12 +28,12 @@
 #define TIM5_PERIOD_MS 100
 #define TIM5_MAX_TASK_SUPPORT 4
 
+//motor_control
+#define TIM6_PERIOD_MS 10
+#define TIM6_MAX_TASK_SUPPORT 3
 
-#define TIM6_PERIOD_MS 1000
-#define TIM6_MAX_TASK_SUPPORT 4
 
-//for test
-#define TIM7_PERIOD_MS 2000
+#define TIM7_PERIOD_MS 1000
 #define TIM7_MAX_TASK_SUPPORT 4
 
 #define TIM8_PERIOD_MS 1000
@@ -126,6 +129,9 @@ extern Tim Global_tim1;
 extern Tim Global_tim2;
 extern Tim Global_tim3;
 extern Tim Global_tim5;
+extern Tim Global_tim6;
+
+
 extern Tim Global_tim7;
 
 

@@ -30,9 +30,11 @@ void TOPIC_Gimbal_Control::encode(uint8_t* pbuffer,
                                 const float& relative_yaw,
                                 const uint8_t& reach_target_minute,
                                 const uint8_t& reach_target_second,
-                                const float& reach_target_second_frac)
+                                const float& reach_target_second_frac,
+                                const int16_t& setting_voltage_or_rpm)
 {
     float* pf;
+    int16_t* pi;
     pf = (float*)&pbuffer[0];
     *pf = relative_pitch;
     pf = (float*)&pbuffer[4];
@@ -43,6 +45,10 @@ void TOPIC_Gimbal_Control::encode(uint8_t* pbuffer,
     
     pf = (float*)&pbuffer[10];
     *pf = reach_target_second_frac;
+    
+    pi = (int16_t*)&pbuffer[14];
+    *pi = setting_voltage_or_rpm;
+
 }
 
 void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer, 
@@ -50,10 +56,11 @@ void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer,
                                 float& relative_yaw,
                                 uint8_t& reach_target_minute,
                                 uint8_t& reach_target_second,
-                                float& reach_target_second_frac)
+                                float& reach_target_second_frac,
+                                int16_t& setting_voltage_or_rpm)
 {
     float* pf;
-
+    int16_t* pi;
     pf = (float*)&pbuffer[0];
     relative_pitch=*pf;
     pf = (float*)&pbuffer[4];
@@ -64,6 +71,9 @@ void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer,
     
     pf = (float*)&pbuffer[10];
     reach_target_second_frac=*pf;
+    pi = (int16_t*)&pbuffer[14];
+    setting_voltage_or_rpm = *pi;
+
 }
 
 

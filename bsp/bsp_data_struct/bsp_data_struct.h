@@ -31,7 +31,7 @@ typedef struct
     uint8_t reach_minute      ;
     uint8_t reach_second      ;
     uint16_t reach_second_frac;
-    char null_2byte[2]        ;
+    int16_t setting_voltage_or_rpm;
     uint32_t crc_check        ;
 
 }ACTION_DATA;
@@ -95,7 +95,7 @@ typedef struct
     SINGLE_MOTOR_DATA pitch_motor_data;
     TIME_DATA cur_time;
     TIME_DATA target_time;
-
+    int16_t setting_voltage_or_rpm;
 }GIMBAL_DATA;
 
 

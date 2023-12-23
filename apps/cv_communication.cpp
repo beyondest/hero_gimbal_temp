@@ -30,8 +30,7 @@ void CV_Node::init_local_data()
     this->plocal_data.action_data.reach_minute = 21;
     this->plocal_data.action_data.reach_second = 21;
     this->plocal_data.action_data.reach_second_frac = 2100;
-    this->plocal_data.action_data.null_2byte[0] = '1' ;
-    this->plocal_data.action_data.null_2byte[1] = '2' ;
+    this->plocal_data.action_data.setting_voltage_or_rpm = 2;
     this->plocal_data.action_data.crc_check = 0;
 
 //Syn Data
@@ -116,7 +115,8 @@ void CV_Node::publish_gimbal_control()
                                         trans_frac_float(this->plocal_data.action_data.relative_yaw),
                                         this->plocal_data.action_data.reach_minute,
                                         this->plocal_data.action_data.reach_second,
-                                        trans_frac_float(this->plocal_data.action_data.reach_second_frac)
+                                        trans_frac_float(this->plocal_data.action_data.reach_second_frac),
+                                        this->plocal_data.action_data.setting_voltage_or_rpm
                                         );
 
     if ((this->feedback_gimbal_control = this->send_msg_to_center(&Global_Topic_gimbal_control)) != SEND_SUCCESS)
@@ -160,7 +160,6 @@ void CV_Node::feedback_pos_data()
                                         this->tmp_cur_pitch,
                                         this->tmp_cur_yaw
                                         );
-
         this->plocal_data.pos_data.present_pitch = trans_frac_int16(this->tmp_cur_pitch);
         this->plocal_data.pos_data.present_yaw = trans_frac_int16(this->tmp_cur_yaw);
     }
@@ -176,9 +175,7 @@ void CV_Node::feedback_pos_data()
                                             this->plocal_data.pos_data.time_minute,
                                             this->plocal_data.pos_data.time_second,
                                             this->tmp_present_second_frac
-                                            );
-
-                                            
+                                            );                                            
         this->plocal_data.pos_data.time_second_frac = trans_frac_uint16(this->tmp_present_second_frac);
     }
     else
@@ -266,7 +263,7 @@ DATA_STATE CV_Node::cv_encode_to_uart()
  * NO.4 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                  |byte6      bytes 1     total 7
  * NO.5 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                 |byte7      bytes 1     total 8
  * NO.6 (reach_target_time_second_frac.4*10000 , '<H')|     (0<=x<=10000)              |byte8-9    bytes 2     total 10 
- * NO.78(setting: b'12', '<c','<c')  (auto add)   |                                |byte10-11  bytes 2     total 12
+ * NO.78(setting_voltage_or_rpm:int, '<h')(only for debug)| (-30000<=x<=30000 if vol)  |byte10-11  bytes 2     total 12
  * NO.9(crc_value:int , '<I')   (auto add to end)     |     (return of cal_crc func)   |byte12-15  bytes 4     total 16 
  * PART_CRC: byte2-5
 */
@@ -279,8 +276,7 @@ void CV_Node::receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
   pout->reach_minute        = prx_data[6];
   pout->reach_second        = prx_data[7];
   pout->reach_second_frac   = *((uint16_t*) &prx_data[8]);
-  pout->null_2byte[0]       = prx_data[10];
-  pout->null_2byte[1]       = prx_data[11];
+  pout->setting_voltage_or_rpm = *((int16_t*)&prx_data[10]);
   pout->crc_check           = *((uint32_t*) &prx_data[12]);
 }
 

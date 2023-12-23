@@ -43,26 +43,21 @@ GMMotor Global_yaw_motor(  /*  Fixed Value  */
 
 
 
+void pitch_control()
+{
+    Global_pitch_motor.control();
+}
+void yaw_control()
+{
+    Global_yaw_motor.control();
+}
+
+
+
 //***************************************************GMMotor API****************************************************
 
 
-/**
- * After start must use to radians, or Motor will be stayed in Motor_Preparing
-*/
-ACTION_STATE GMMotor::start()
-{
-    this->reset();
-    if (this->motor_flag == MOTOR_ERROR)
-    {
-        return ACTION_FAILURE;
-    }  
-    else
-    {
-        this->target_radians = this->motor_reset_radians;
-        return ACTION_SUCESS; 
-    }
 
-}         
 
 
 ACTION_STATE GMMotor::shutdown()
@@ -93,7 +88,33 @@ ACTION_STATE GMMotor::get_cur_radians(float* pcur_radians)
     } 
     
 }
+ACTION_STATE GMMotor::get_cur_rpm(int16_t* prpm)
+{
+    if (this->motor_flag == MOTOR_ERROR)
+    {
+        LOG_INFO("Motor error");
+        return ACTION_FAILURE;
+    }
+    else
+    {
+        *prpm = this->cur_rpm;
+        return ACTION_SUCESS;
+    } 
+}
 
+ACTION_STATE GMMotor::get_cur_code(int16_t* pcode)
+{
+    if (this->motor_flag == MOTOR_ERROR)
+    {
+        LOG_INFO("Motor error");
+        return ACTION_FAILURE;
+    }
+    else
+    {
+        *pcode = this->cur_code;
+        return ACTION_SUCESS;
+    } 
+}
 
 /**
  * Only when motor is running, will to radians; but will return success both when motor already and running
@@ -151,9 +172,13 @@ ACTION_STATE GMMotor::to_voltage(int16_t no_clamp_voltage)
 
 ACTION_STATE GMMotor::to_rpm(int16_t rpm)
 {
-    if (this->motor_flag == MOTOR_RUNNING &&this->motor_flag == MOTOR_PREPARING)
+    if (this->motor_flag == MOTOR_RUNNING)
     {
         this->target_rpm = rpm;
+        return ACTION_SUCESS;
+    }
+    else if ( this->motor_flag == MOTOR_PREPARING)
+    {
         return ACTION_SUCESS;
     }
     else if (this->motor_flag == MOTOR_ERROR)
@@ -194,7 +219,8 @@ void GMMotor::control()
         }
         else
         {
-            return;
+            this->cur_setting_voltage = GM_MOTOR_SHUTDOWN_VOLTAGE;
+            this->send_data();
         }
     }
     else if (this->motor_flag == MOTOR_RUNNING)
@@ -229,8 +255,10 @@ void GMMotor::control()
 */
 void GMMotor::get_feedback()
 {
+
     this->receive_data();
     this->check_motor_state();
+
     if (this->motor_flag == MOTOR_PREPARING)
     {   
         if (this->debug_flag == NO_DEBUG)
@@ -313,7 +341,7 @@ GMMotor::GMMotor(
     {
         this->tx_header.StdId = GM_CAN_SEND_ID_BASE;
     }
-
+    this->start();
 }
 
 GMMotor::~GMMotor()
@@ -366,12 +394,13 @@ void GMMotor::decode()
     }    
 }
 
-
+/**
+ * @note Will Clamp setting voltage here, this is the LAST defence
+*/
 void GMMotor::send_data()
 {
     this->cur_setting_voltage = CLAMP(this->cur_setting_voltage,this->Min_setting_voltage,this->Max_setting_voltage);
     set_buffer(this->ptx_buffer,0,8);
-
     this->encode();
     this->pcan->send_data(&this->tx_header,this->ptx_buffer);
 }
@@ -440,16 +469,12 @@ void GMMotor::check_motor_state()
 
 /**
  * @brief Reset motor will reset pid, reset target to cur, and check if everything all right; if all is well, motor_flag will be set to MOTOR_PREPARING
- * @warning Motor will stay to the present radians after reset
- * @warning Motor will not change motor flag if everything all right
+ * @warning Motor will go to running state if you do not set to shutdown manually after reset
+ *
 */
 void GMMotor::reset()
 {
-
-
     this->check_motor_state();
-
-
     if (this->motor_flag == MOTOR_ERROR)
     {
         this->motor_error_handler();
@@ -473,9 +498,19 @@ void GMMotor::reset()
     this->target_time.second = this->cur_time.second;
     this->target_time.second_frac_4 = this->cur_time.second_frac_4;
     
-
+    this->cur_setting_voltage = GM_MOTOR_SHUTDOWN_VOLTAGE;
 }
 
+
+/**
+ * Called in construtor of class, motor will be able to go to running state after receiving first msg of can
+*/
+void GMMotor::start()
+{
+    this->reset(); 
+    this->target_radians = this->motor_start_radians;
+    return;
+}         
 
 
 

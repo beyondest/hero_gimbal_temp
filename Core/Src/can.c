@@ -56,32 +56,7 @@ void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
-  CAN_FilterTypeDef can_filter;
-  can_filter.SlaveStartFilterBank = GLOBAL_CAN_FILTER_SLAVE_START;
-  can_filter.FilterBank = CAN1_FILTER_INDEX;
-  can_filter.FilterMode = GLOBAL_CAN_FILTER_TYPE;
-  can_filter.FilterScale = GLOBAL_CAN_FILTER_SCALE;
-  //init
-  can_filter.FilterIdHigh = 0x0000;
-  can_filter.FilterIdLow = 0x0000;
-  can_filter.FilterMaskIdHigh = 0x0000;
-  can_filter.FilterMaskIdLow = 0x0000;
 
-  can_filter.FilterFIFOAssignment = CAN1_FIFO;
-  can_filter.FilterActivation = ENABLE;
-
-  can_filter.FilterIdLow = CAN1_FILTER_ID;
-  can_filter.FilterMaskIdLow = CAN1_MASK_ID;
-  
-  if (HAL_CAN_ConfigFilter(&hcan1,&can_filter) != HAL_OK)
-  {
-      Error_Handler();
-  }
-  
-  if (HAL_CAN_ActivateNotification(&hcan1,CAN1_IT_TYPE) != HAL_OK)
-  {
-      Error_Handler();
-  }
   /* USER CODE END CAN1_Init 2 */
 
 }
@@ -149,9 +124,9 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 8, 0);
+    HAL_NVIC_SetPriority(CAN1_TX_IRQn, CAN1_TX_IT_PREEMPT_PRIORITY, CAN1_TX_IT_SUB_PRIORITY);
     HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 7, 0);
+    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, CAN1_RX_IT_PREEMPT_PRIORITY, CAN1_RX_IT_SUB_PRIORITY);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);

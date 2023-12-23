@@ -29,6 +29,8 @@
 //BSP
 #include "bsp_tim.h"
 #include "bsp_usart.h"
+#include "bsp_led.h"
+#include "bsp_can.h"
 //MODULES
 //APP
 #include "msg_center.h"
@@ -73,15 +75,6 @@ GIMBAL_DATA* tmpgim = &Global_gimbal_node.plocal_data;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void led_red_blink()
-{
-  HAL_GPIO_TogglePin(LED_RED_GPIO_Port,LED_RED_Pin);
-
-}
-void led1_blink()
-{
-  HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
-}
 
 /* USER CODE END PFP */
 
@@ -135,33 +128,34 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
- // Global_tim3.add_task(test);
+  can_user_init(&hcan1);
   /* USER CODE END 2 */
   
-  Global_usart8.receive_data();
 
   Global_tim1.add_task(msg_center_run);
   Global_tim2.add_task(msg_center_update_second);
   Global_tim2.add_task(gimbal_update_second);
   Global_tim3.add_task(cv_run);
-  Global_tim5.add_task(gimbal_run);
+  Global_tim5.add_task(gimbal_debug_run);
+  Global_tim6.add_task(pitch_control);
 
-  Global_usart8.set_tx_callback(led_red_blink);
-  Global_usart8.set_rx_callback(led1_blink);
+  Global_usart8.set_tx_callback(led1_blink);
+  Global_usart8.set_rx_callback(led2_blink);
 
- // Global_tim7.add_task(test);
-  //center rotate
+  Global_can1.set_tx_callback(led3_blink);
+  Global_can1.set_rx_callback(led4_blink);
+
+  Global_usart8.start();
+  //Global_can1.start();
+
   Global_tim1.start_task();
-  //update second
   Global_tim2.start_task();
   HAL_Delay(13);
-
-  //cvnode
   Global_tim3.start_task();
   HAL_Delay(13);
-
-  //gimbal 
   Global_tim5.start_task();
+  HAL_Delay(13);
+  Global_tim6.start_task();
 
   //test
  // Global_tim7.start_task();

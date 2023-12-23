@@ -8,7 +8,7 @@
 
 //****************************************************Custom Define******************************************
 
-#define TOPIC_GIMBAL_CONTROL_LENGTH 14
+#define TOPIC_GIMBAL_CONTROL_LENGTH 16
 #define TOPIC_GIMBAL_POS_LENGTH 8
 #define TOPIC_PRESENT_TIME_LENGTH 6
 #define TOPIC_URGENT_MSG_LENGTH 16
@@ -83,13 +83,13 @@ public:
 
 
 /**
- * buffer_size: uint8t * 14
+ * buffer_size: uint8t * 16
  * NO.0 (relative_pitch.4:float , '<F')               |     (abs(x)<=1.5708)               |byte0-3    bytes 4     total 4
  * NO.1 (relative_yaw.4:float , '<F')                 |     (abs(x)<=3.1416)               |byte4-7    bytes 4     total 8
  * NO.2 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                      |byte8      bytes 1     total 9
  * NO.3 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                     |byte9      bytes 1     total 10
  * NO.4 (reach_target_time_second_frac.4 , '<F')      |     (0<=x<=1)                      |byte10-13  bytes 4     total 14 
- * 
+ * NO.5 (setting_voltage_or_rpm: int16 ,  '<h')       |     (-30000<=x<=30000)             |byte14-15  bytes 2     total 16   
  * 
 */
 class TOPIC_Gimbal_Control:public Topic
@@ -107,13 +107,15 @@ public:
                 const float& relative_yaw,
                 const uint8_t& reach_target_minute,
                 const uint8_t& reach_target_second,
-                const float& reach_target_second_frac);
+                const float& reach_target_second_frac,
+                const int16_t& setting_voltage_ro_rpm);
     void decode(uint8_t* pbuffer, 
                 float& relative_pitch, 
                 float& relative_yaw,
                 uint8_t& reach_target_minute,
                 uint8_t& reach_target_second,
-                float& reach_target_second_frac);
+                float& reach_target_second_frac,
+                int16_t& setting_voltage_or_rpm);
 };
 
 //***************************************TOPIC: GIMBAL_POS****************************************************88
