@@ -375,7 +375,7 @@ void GMMotor::encode()
 
     this->cur_setting_voltage = CLAMP(this->cur_setting_voltage, this->Min_setting_voltage, this->Max_setting_voltage);
     
-    uint8_t index = this->Motor_ID-1;
+    uint8_t index = (uint8_t)((this->Motor_ID-1)*2);
     ptx_buffer[index] = (this->cur_setting_voltage >> 8) & 0xff;
     ptx_buffer[index+1] = this->cur_setting_voltage & 0xff;
 

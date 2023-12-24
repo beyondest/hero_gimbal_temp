@@ -56,7 +56,31 @@ void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
+  CAN_FilterTypeDef can_filter;
+  can_filter.SlaveStartFilterBank = GLOBAL_CAN_FILTER_SLAVE_START;
+  can_filter.FilterBank = CAN1_FILTER_INDEX;
+  can_filter.FilterMode = GLOBAL_CAN_FILTER_TYPE;
+  can_filter.FilterScale = GLOBAL_CAN_FILTER_SCALE;
 
+  can_filter.FilterIdHigh = 0;
+  can_filter.FilterIdLow = 0;
+  can_filter.FilterMaskIdHigh = 0;
+  can_filter.FilterMaskIdLow = 0;
+
+  can_filter.FilterFIFOAssignment = CAN1_FIFO;
+  can_filter.FilterActivation = ENABLE;
+
+  can_filter.FilterIdLow = CAN1_FILTER_ID;
+  can_filter.FilterMaskIdLow = CAN1_MASK_ID;
+  
+  if (HAL_CAN_ConfigFilter(&hcan1,&can_filter) != HAL_OK)
+  {
+      Error_Handler();
+  }
+  if (HAL_CAN_ActivateNotification(&hcan1,CAN1_IT_TYPE) != HAL_OK)
+  {
+      Error_Handler();
+  }
   /* USER CODE END CAN1_Init 2 */
 
 }

@@ -27,10 +27,13 @@
 #include "gpio.h"
 
 //BSP
+
 #include "bsp_tim.h"
 #include "bsp_usart.h"
 #include "bsp_led.h"
 #include "bsp_can.h"
+
+
 //MODULES
 //APP
 #include "msg_center.h"
@@ -128,8 +131,6 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-  can_user_init(&hcan1);
-  //fu
   /* USER CODE END 2 */
   
 
@@ -139,6 +140,7 @@ int main(void)
   Global_tim3.add_task(cv_run);
   Global_tim5.add_task(gimbal_debug_run);
   Global_tim6.add_task(pitch_control);
+  Global_tim6.add_task(led5_blink);
 
   Global_usart8.set_tx_callback(led1_blink);
   Global_usart8.set_rx_callback(led2_blink);
@@ -147,7 +149,7 @@ int main(void)
   Global_can1.set_rx_callback(led4_blink);
 
   Global_usart8.start();
-  //Global_can1.start();
+  Global_can1.start();
 
   Global_tim1.start_task();
   Global_tim2.start_task();
@@ -200,7 +202,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 6;
-  RCC_OscInitStruct.PLL.PLLN = 180;
+  RCC_OscInitStruct.PLL.PLLN = 168;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -210,9 +212,9 @@ void SystemClock_Config(void)
 
   /** Activate the Over-Drive mode
   */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  //if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
-    Error_Handler();
+  //  Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
@@ -231,7 +233,7 @@ void SystemClock_Config(void)
 
   /** Enables the Clock Security System
   */
-  HAL_RCC_EnableCSS();
+  //HAL_RCC_EnableCSS();
 }
 
 /* USER CODE BEGIN 4 */

@@ -81,8 +81,6 @@ extern "C"{
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan);
-void User_Can_Init();
-void can_user_init(CAN_HandleTypeDef* hcan);
 
 
 #ifdef __cplusplus
