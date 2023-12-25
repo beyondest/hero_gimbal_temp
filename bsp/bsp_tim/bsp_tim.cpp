@@ -2,14 +2,14 @@
 #include "mymath.h"
 
 
-Tim Global_tim1(TIM1_PERIOD_MS,
+Tim Global_tim1(TIM1_TASK_PERIOD_MS,
                 TIM1_CLOCK_FREQUENCY_MHZ,
                 TIM1_MAX_TASK_SUPPORT,
                 TIM1_PRESCALER,
                 TIM1_COUNT_NUMS,
                 &htim1);
 
-Tim Global_tim2(TIM2_PERIOD_MS,
+Tim Global_tim2(TIM2_TASK_PERIOD_MS,
                 TIM2_CLOCK_FREQUENCY_MHZ,
                 TIM2_MAX_TASK_SUPPORT,
                 TIM2_PRESCALER,
@@ -18,7 +18,7 @@ Tim Global_tim2(TIM2_PERIOD_MS,
 
 
 
-Tim Global_tim3(TIM3_PERIOD_MS,
+Tim Global_tim3(TIM3_TASK_PERIOD_MS,
                 TIM3_CLOCK_FREQUENCY_MHZ,
                 TIM3_MAX_TASK_SUPPORT,
                 TIM3_PRESCALER,
@@ -26,21 +26,21 @@ Tim Global_tim3(TIM3_PERIOD_MS,
                 &htim3);
 
 
-Tim Global_tim5(TIM5_PERIOD_MS,
+Tim Global_tim5(TIM5_TASK_PERIOD_MS,
                 TIM5_CLOCK_FREQUENCY_MHZ,
                 TIM5_MAX_TASK_SUPPORT,
                 TIM5_PRESCALER,
                 TIM5_COUNT_NUMS,
                 &htim5);
 
-Tim Global_tim6(TIM6_PERIOD_MS,
+Tim Global_tim6(TIM6_TASK_PERIOD_MS,
                 TIM6_CLOCK_FREQUENCY_MHZ,
                 TIM6_MAX_TASK_SUPPORT,
                 TIM6_PRESCALER,
                 TIM6_COUNT_NUMS,
                 &htim6);
 
-Tim Global_tim7(TIM7_PERIOD_MS,
+Tim Global_tim7(TIM7_TASK_PERIOD_MS,
                 TIM7_CLOCK_FREQUENCY_MHZ,
                 TIM7_MAX_TASK_SUPPORT,
                 TIM7_PRESCALER,

@@ -47,6 +47,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         Global_can1.rx_fifo_msg_pending_callback();
         Global_pitch_motor.get_feedback();
         Global_yaw_motor.get_feedback();
+
     }
 }
 
@@ -214,6 +215,7 @@ void Can::receive_data_and_giveout_to_clients()
 void Can::rx_fifo_msg_pending_callback()
 {
     this->receive_data_and_giveout_to_clients();
+
     if (this->rx_callback_period_count++ == this->Rxcallback_period)
     {
         this->rx_callback_period_count = 0;

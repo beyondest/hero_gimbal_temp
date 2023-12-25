@@ -10,7 +10,13 @@ Gimbal_Node Global_gimbal_node(&Global_msg_center,
                                 &Global_pitch_motor,
                                 &Global_yaw_motor);
 
-
+/**
+ * Correlated Frequency:
+ * 
+ * Set target radians Frequency
+ * Get present radians Frequency
+ * Subscribe and publish Frequency
+*/
 void gimbal_run()
 {
 

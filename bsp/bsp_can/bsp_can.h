@@ -10,12 +10,12 @@
 //**************************************************Custom Define*****************************************************
 
 
-#define CAN1_RXCALLBACK_PERIOD 1000
+#define CAN1_RXCALLBACK_PERIOD 10
 #define CAN1_MAX_RXCALLBACK_SUPPORT_NUMS 4
 #define CAN1_RX_DATA_BUFFER_LENGTH  8
 #define CAN1_MAX_CLIENTS_NUMS 8
 
-#define CAN2_RXCALLBACK_PERIOD 1000
+#define CAN2_RXCALLBACK_PERIOD 10
 #define CAN2_MAX_RXCALLBACK_SUPPORT_NUMS 4
 #define CAN2_RX_DATA_BUFFER_LENGTH  8
 #define CAN2_MAX_CLIENTS_NUMS 8

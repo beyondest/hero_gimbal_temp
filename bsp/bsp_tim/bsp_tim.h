@@ -8,35 +8,35 @@
 
 //**************************************************Custom Define*****************************************************
 
-//Notice: you must set period bigger than main.h "" period of tim
+//Notice: you must set task period bigger than tim precision in main.h
 
 
 //center rotater
-#define TIM1_PERIOD_MS 10
+#define TIM1_TASK_PERIOD_MS 10
 #define TIM1_MAX_TASK_SUPPORT 4
 //second updater
-#define TIM2_PERIOD_MS 1000
+#define TIM2_TASK_PERIOD_MS 1000
 #define TIM2_MAX_TASK_SUPPORT 4
 //cv node
-#define TIM3_PERIOD_MS 500
+#define TIM3_TASK_PERIOD_MS 100
 #define TIM3_MAX_TASK_SUPPORT 4
 
-#define TIM4_PERIOD_MS 1000
+#define TIM4_TASK_PERIOD_MS 1000
 #define TIM4_MAX_TASK_SUPPORT 4
 
 //gimbal node
-#define TIM5_PERIOD_MS 100
+#define TIM5_TASK_PERIOD_MS 2
 #define TIM5_MAX_TASK_SUPPORT 4
 
-//motor_control
-#define TIM6_PERIOD_MS 10
+
+#define TIM6_TASK_PERIOD_MS 10
 #define TIM6_MAX_TASK_SUPPORT 3
 
 
-#define TIM7_PERIOD_MS 1000
+#define TIM7_TASK_PERIOD_MS 1000
 #define TIM7_MAX_TASK_SUPPORT 4
 
-#define TIM8_PERIOD_MS 1000
+#define TIM8_TASK_PERIOD_MS 1000
 #define TIM8_MAX_TASK_SUPPORT 4
 
 

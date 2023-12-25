@@ -139,31 +139,30 @@ int main(void)
   Global_tim2.add_task(gimbal_update_second);
   Global_tim3.add_task(cv_run);
   Global_tim5.add_task(gimbal_run);
-  Global_tim6.add_task(pitch_control);
-  Global_tim6.add_task(yaw_control);
 
 
-  Global_usart8.set_tx_callback(led1_blink);
+
   Global_usart8.set_rx_callback(led2_blink);
 
   Global_can1.set_tx_callback(led3_blink);
   Global_can1.add_rx_callback(led4_blink);
-  
+  Global_can1.add_rx_callback(pitch_control);
+  Global_can1.add_rx_callback(yaw_control);
+
 
   Global_usart8.start();
   Global_can1.start();
 
-  Global_tim1.start_task();
-  Global_tim2.start_task();
-  HAL_Delay(13);
-  Global_tim3.start_task();
-  HAL_Delay(13);
-  Global_tim5.start_task();
-  HAL_Delay(13);
-  Global_tim6.start_task();
 
-  //test
- // Global_tim7.start_task();
+  Global_tim1.start_task();
+  HAL_Delay(1);
+  Global_tim2.start_task();
+  HAL_Delay(1);
+  Global_tim3.start_task();
+  HAL_Delay(1);
+  Global_tim5.start_task();
+  HAL_Delay(1);
+
 
   *tmpcv = *tmpcv;
   *tmpgim = *tmpgim;

@@ -8,7 +8,7 @@ set(mylib_name ${root_dir_name}_lib)
 set(compile_mode 1) #0 for both lib and app, 1 for app, 2 for lib   
 set(EXECUTABLE_OUTPUT_PATH ${ROOT_DIR}/build/exe)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ROOT_DIR}/lib)
-set(CMAKE_BUILD_TYPE Debug)     #Debug Release RelWithDebInfo MinSizeRel
+set(CMAKE_BUILD_TYPE Release)     #Debug Release RelWithDebInfo MinSizeRel
 
 
 project(mypro C CXX ASM)

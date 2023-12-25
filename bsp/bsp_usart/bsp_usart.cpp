@@ -80,10 +80,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 void Usart::send_data()
 {
+  HAL_StatusTypeDef tmp_status;
   switch (this->usart_mode)
   {
   case USART_DMA:
-      if (HAL_UART_Transmit_DMA(this->huart,this->ptx_buffer,this->tx_length) != HAL_OK)
+      tmp_status = HAL_UART_Transmit_DMA(this->huart,this->ptx_buffer,this->tx_length);
+      if (tmp_status != HAL_OK )
       {
         Error_Handler();
       }

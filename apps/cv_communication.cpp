@@ -10,6 +10,15 @@ CV_Node Global_cv_node(
     &Global_usart8
 );
 
+
+
+/**
+ * Correlated Frequency
+ * 
+ * Feedback through usart Frequency
+ * Decode From usart Frequency
+ * Subscribe and publish Frequency
+*/
 void cv_run()
 {
     Global_cv_node.run(); 

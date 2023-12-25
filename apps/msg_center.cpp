@@ -13,6 +13,11 @@ Msg_Center Global_msg_center(
 );
 
 
+/**
+ * Correlated Frequency
+ * Rotated Frequency only influence check expired msg
+ * 
+*/
 void msg_center_run()
 {
     Global_msg_center.run();

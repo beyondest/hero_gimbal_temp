@@ -74,32 +74,19 @@ void Error_Handler(void);
 
 
 
-#define TIM1_Period "1ms"
-#define TIM1_Quantum "0_01ms"
-#define TIM2_Period "10ms"
-#define TIM2_Quantum "0_1ms"
-#define TIM3_Period "100ms"
-#define TIM3_Quantum "0_1ms"
-
-
-
-#define TIM4_Quantum "0_1ms"
-#define TIM4_Period "1000ms"
-
-
-
-#define TIM5_Quantum "0_1ms"
-#define TIM5_Period "1ms"
-#define TIM6_Quantum "0_1ms"
-#define TIM6_Period "10ms"
-#define TIM7_Quantum "0_1ms"
-#define TIM7_Period "100ms"
 
 
 
 
-#define TIM8_Period "1000ms"
-#define TIM8_Quantum "0_1ms"
+
+
+
+
+
+
+
+
+
 
 
 
@@ -164,42 +151,65 @@ void Error_Handler(void);
 #define TIM1_COUNT_NUMS 100
 #define TIM1_PREEMPT_PRIORITY 4
 #define TIM1_SUB_PRIORITY 15
+#define TIM1_Precision "1ms"
+#define TIM1_Quantum "0_01ms"
+
 
 //second update
 #define TIM2_PRESCALER 8999
 #define TIM2_COUNT_NUMS 100
 #define TIM2_PREEMPT_PRIORITY 4
 #define TIM2_SUB_PRIORITY 0
+#define TIM2_Precision "10ms"
+#define TIM2_Quantum "0_1ms"
 
 //cv_node
 #define TIM3_PRESCALER 8999
-#define TIM3_COUNT_NUMS 1000
+#define TIM3_COUNT_NUMS 10
 #define TIM3_PREEMPT_PRIORITY 4
 #define TIM3_SUB_PRIORITY 1
+#define TIM3_Precision "1ms"
+#define TIM3_Quantum "0_1ms"
+
+
 
 #define TIM4_PRESCALER 8999
 #define TIM4_COUNT_NUMS 10000
+#define TIM4_Quantum "0_1ms"
+#define TIM4_Precision "1000ms"
 
 //gimbal_node
 #define TIM5_PRESCALER 8999
 #define TIM5_COUNT_NUMS 10
 #define TIM5_PREEMPT_PRIORITY 4
 #define TIM5_SUB_PRIORITY 1
+#define TIM5_Quantum "0_1ms"
+#define TIM5_Precision "1ms"
+
 
 //motor control
 #define TIM6_PRESCALER 8999
 #define TIM6_COUNT_NUMS 100
 #define TIM6_PREEMPT_PRIORITY 4
 #define TIM6_SUB_PRIORITY 5
+#define TIM6_Quantum "0_1ms"
+#define TIM6_Precision "10ms"
+
 
 //nothing
 #define TIM7_PRESCALER 8999
 #define TIM7_COUNT_NUMS 1000
 #define TIM7_PREEMPT_PRIORITY 4
 #define TIM7_SUB_PRIORITY 0
+#define TIM7_Quantum "0_1ms"
+#define TIM7_Precision "100ms"
+
 
 #define TIM8_PRESCALER 17999
 #define TIM8_COUNT_NUMS 10000
+#define TIM8_Precision "1000ms"
+#define TIM8_Quantum "0_1ms"
+
 
 //DMA setting
 #define DMA_stream3 UART7_Rx
