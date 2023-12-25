@@ -51,9 +51,11 @@ private:
     uint8_t usart_data_wrong_count = 0;
     uint8_t connect = 0;
 
+
 //custom private methods
+
     void publish_gimbal_control();
-    void publish_syn_data();
+    void publish_syn_data(); 
     void feedback_pos_data();
 
     DATA_STATE cv_encode_to_uart();

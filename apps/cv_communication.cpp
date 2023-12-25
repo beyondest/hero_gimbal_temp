@@ -24,14 +24,19 @@ void cv_run()
     Global_cv_node.run(); 
 }
 
+
 void cv_debug_run()
 {
     Global_cv_node.debug_run();
 }
+
+
+
 //**************************************************Init************************************************************
 void CV_Node::init_local_data()
 {
 // Action Data   
+
     this->plocal_data.action_data.sof = 'A';
     this->plocal_data.action_data.fire_times = -1;
     this->plocal_data.action_data.target_pitch = 0;
@@ -43,6 +48,7 @@ void CV_Node::init_local_data()
     this->plocal_data.action_data.crc_check = 0;
 
 //Syn Data
+
     this->plocal_data.syn_data.sof = 'S';
     this->plocal_data.syn_data.time_minute = 20;
     this->plocal_data.syn_data.time_second = 20;
@@ -51,6 +57,7 @@ void CV_Node::init_local_data()
     this->plocal_data.syn_data.crc_check = 0;
 
 //Pos Data  
+
     this->plocal_data.pos_data.sof = 'P';
     this->plocal_data.pos_data.time_minute = 0;
     this->plocal_data.pos_data.time_second = 0;
@@ -80,21 +87,26 @@ void CV_Node::run()
     switch (this->cv_decode_from_uart())
     {
     case DATA_STATE_WRONG:
+
         this->usart_data_wrong_count++;
         this->cv_usart_error_handler();
         break;
+
     case DATA_STATE_ACTION:
         this->connect = 1;
         this->usart_data_wrong_count = 0;
         HAL_GPIO_TogglePin(LED8_GPIO_Port,LED8_Pin);
         this->publish_gimbal_control();
         break;
+
     case DATA_STATE_SYN:
         this->connect = 1;
         this->usart_data_wrong_count = 0;
         HAL_GPIO_TogglePin(LED7_GPIO_Port,LED7_Pin);
         this->publish_syn_data();
+
         break;
+
     default:
         break;
     }

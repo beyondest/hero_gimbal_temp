@@ -42,8 +42,8 @@ void MX_CRC_Init(void)
   {
     Error_Handler();
   }
+  
   /* USER CODE BEGIN CRC_Init 2 */
-
   /* USER CODE END CRC_Init 2 */
 
 }
@@ -62,6 +62,7 @@ void HAL_CRC_MspInit(CRC_HandleTypeDef* crcHandle)
 
   /* USER CODE END CRC_MspInit 1 */
   }
+
 }
 
 void HAL_CRC_MspDeInit(CRC_HandleTypeDef* crcHandle)

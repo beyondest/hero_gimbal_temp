@@ -110,6 +110,7 @@ public:
                 const uint8_t& reach_target_second,
                 const float& reach_target_second_frac,
                 const int16_t& setting_voltage_ro_rpm);
+                
     void decode(uint8_t* pbuffer, 
                 float& target_pitch, 
                 float& target_yaw,

@@ -23,9 +23,13 @@ void msg_center_run()
     Global_msg_center.run();
 }
 
+
 void msg_center_update_second()
 {
+
     Global_msg_center.update_center_second();
+
+
 }
 
 
@@ -235,8 +239,6 @@ void Msg_Center::clean_expired_data()
         target_index--;
         target_index = RCLAMP(target_index,0,this->Max_topic_contain_nums);
     }
-    
-
 }
 
 /**

@@ -155,13 +155,13 @@ int main(void)
 
 
   Global_tim1.start_task();
-  HAL_Delay(1);
+  HAL_Delay(2);
   Global_tim2.start_task();
-  HAL_Delay(1);
+  HAL_Delay(2);
   Global_tim3.start_task();
-  HAL_Delay(1);
+  HAL_Delay(2);
   Global_tim5.start_task();
-  HAL_Delay(1);
+  HAL_Delay(2);
 
 
   *tmpcv = *tmpcv;
@@ -172,8 +172,7 @@ int main(void)
   {
     
     /* USER CODE END WHILE */
-
-    
+  
     HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
     HAL_Delay(1000);
     
