@@ -138,15 +138,17 @@ int main(void)
   Global_tim2.add_task(msg_center_update_second);
   Global_tim2.add_task(gimbal_update_second);
   Global_tim3.add_task(cv_run);
-  Global_tim5.add_task(gimbal_debug_run);
+  Global_tim5.add_task(gimbal_run);
   Global_tim6.add_task(pitch_control);
-  Global_tim6.add_task(led5_blink);
+  Global_tim6.add_task(yaw_control);
+
 
   Global_usart8.set_tx_callback(led1_blink);
   Global_usart8.set_rx_callback(led2_blink);
 
   Global_can1.set_tx_callback(led3_blink);
-  Global_can1.set_rx_callback(led4_blink);
+  Global_can1.add_rx_callback(led4_blink);
+  
 
   Global_usart8.start();
   Global_can1.start();
@@ -171,8 +173,10 @@ int main(void)
   {
     
     /* USER CODE END WHILE */
+
+    
     HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
-    HAL_Delay(3000);
+    HAL_Delay(1000);
     
     /* USER CODE BEGIN 3 */
   }
@@ -202,7 +206,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 6;
-  RCC_OscInitStruct.PLL.PLLN = 168;
+  RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -212,9 +216,9 @@ void SystemClock_Config(void)
 
   /** Activate the Over-Drive mode
   */
-  //if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
-  //  Error_Handler();
+    Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks

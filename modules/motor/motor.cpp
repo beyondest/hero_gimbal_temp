@@ -1,5 +1,5 @@
 #include "motor.h"
-
+#include "bsp_led.h"
 
 GMMotor Global_pitch_motor(/*  Fixed Value  */
                            PITCH_MOTOR_ID,
@@ -15,6 +15,7 @@ GMMotor Global_pitch_motor(/*  Fixed Value  */
                            PITCH_MAX_RPM,
                            PITCH_MIN_RPM,
                            PITCH_MAX_TORQUE_I,
+                           PITCH_MIN_TORQUE_I,
                            PITCH_MAX_TEMPERATURE,
                            /*  Pid Init    */
                            &Global_pitch_radians_pid,
@@ -35,6 +36,7 @@ GMMotor Global_yaw_motor(  /*  Fixed Value  */
                            YAW_MAX_RPM,
                            YAW_MIN_RPM,
                            YAW_MAX_TORQUE_I,
+                           YAW_MIN_TORQUE_I,
                            YAW_MAX_TEMPERATURE,
                            /*  Pid Init    */
                            &Global_yaw_radians_pid,
@@ -111,7 +113,7 @@ ACTION_STATE GMMotor::get_cur_code(int16_t* pcode)
     }
     else
     {
-        *pcode = this->cur_code;
+        *pcode = (int16_t)this->cur_code;
         return ACTION_SUCESS;
     } 
 }
@@ -256,7 +258,7 @@ void GMMotor::control()
 void GMMotor::get_feedback()
 {
 
-    this->receive_data();
+    this->decode();
     this->check_motor_state();
 
     if (this->motor_flag == MOTOR_PREPARING)
@@ -304,7 +306,8 @@ GMMotor::GMMotor(
             uint16_t min_code,
             int16_t max_rpm,
             int16_t min_rpm,
-            int16_t max_torue_I,
+            int16_t max_torque_I,
+            int16_t min_torque_I,
             uint8_t max_temperature,
             Pid* pradians_pid,
             Pid* prpm_pid
@@ -321,50 +324,67 @@ GMMotor::GMMotor(
             Min_code(min_code),
             Max_rpm(max_rpm),
             Min_rpm(min_rpm),
-            Max_torque_I(max_torue_I),
+            Max_torque_I(max_torque_I),
+            Min_torque_I(min_torque_I),
             Max_temperature(max_temperature),
             pradians_pid(pradians_pid),
             prpm_pid(prpm_pid)
 {
 
     this->prx_buffer = new uint8_t[rx_buffer_length];
-    this->ptx_buffer = new uint8_t[tx_buffer_length];
-    set_buffer(this->ptx_buffer,0,this->rx_buffer_length);
+
     set_buffer(this->prx_buffer,0,this->rx_buffer_length);
+    set_buffer(GMMotor::pshared_tx_buffer,0,this->tx_buffer_length);
 
-    if (this->Motor_ID > 4)
-    {
-        this->tx_header.StdId = GM_CAN_SEND_EXT_ID_BASE ;
-
-    }
-    else
-    {
-        this->tx_header.StdId = GM_CAN_SEND_ID_BASE;
-    }
+    
+    this->rx_header.StdId =GM_CAN_FEEDBACK_ID_BASE + this->Motor_ID;
+    this->tx_header.StdId = (this->Motor_ID<5)?(GM_CAN_SEND_ID_BASE):(GM_CAN_SEND_EXT_ID_BASE) ;
+    
+    this->pcan->add_client(this->prx_buffer,&this->rx_header);
     this->start();
+
 }
+
 
 GMMotor::~GMMotor()
 {
     delete[] prx_buffer;
-    delete[] ptx_buffer;
 
 };
 
-float GMMotor::trans_code_to_abspos_radians(uint16_t code)
+/**
+ * @brief Will detect if round ++ or -- in this function
+*/
+float GMMotor::trans_code_to_abspos_radians()
 {
-    if (this->Code_zero_offset == 10000)
-    {
-        LOG_INFO("Set motor offset first before doing anything");
-        while (1)
-        {
-            /* code */
-        }
-    }    
-
     float tmp_float = 0;
-    tmp_float = ((float)code - (float)this->Code_zero_offset)/(float)this->Max_code;
-    tmp_float = tmp_float * 2 * PIE;
+    float tmp_real_code = 0;
+
+    if ((this->Max_code - this->pre_code) < this->code_mutation_dectect_interval_length )
+    {
+        led6_blink();
+        if ( (this->cur_code - 0)         < this->code_mutation_dectect_interval_length)
+        {
+            led_red_blink();
+            round_count ++;
+        }
+    }
+    else if ((this->pre_code - 0)         < this->code_mutation_dectect_interval_length)
+    {
+        led6_blink();
+        if ((this->Max_code - this->cur_code)< this->code_mutation_dectect_interval_length)
+        {
+            led_red_blink();
+            round_count --;
+        }
+    }
+    
+    tmp_real_code = (float)this->cur_code + (float)this->round_count * (float)this->Max_code;
+ 
+    tmp_float     = (tmp_real_code - (float)this->Code_zero_offset) / (float)this->Max_code;
+    tmp_float     = tmp_float * 2 * PIE;
+
+
     return tmp_float;
 }
 
@@ -372,26 +392,24 @@ float GMMotor::trans_code_to_abspos_radians(uint16_t code)
 
 void GMMotor::encode()
 {
-
-    this->cur_setting_voltage = CLAMP(this->cur_setting_voltage, this->Min_setting_voltage, this->Max_setting_voltage);
+    uint8_t index = 0;
     
-    uint8_t index = (uint8_t)((this->Motor_ID-1)*2);
-    ptx_buffer[index] = (this->cur_setting_voltage >> 8) & 0xff;
-    ptx_buffer[index+1] = this->cur_setting_voltage & 0xff;
+    index = (Motor_ID<5)?((uint8_t)((this->Motor_ID-1) * 2)):((uint8_t)(this->Motor_ID-5) * 2);
+    GMMotor::pshared_tx_buffer[index] = (this->cur_setting_voltage >> 8) & 0xff;
+    GMMotor::pshared_tx_buffer[index+1] = this->cur_setting_voltage & 0xff;
 
 }
 
+
 void GMMotor::decode()
 {
-    uint8_t index = this->rx_header.StdId - GM_CAN_FEEDBACK_ID_BASE;
-    if (index == this->Motor_ID)
-    {
-        this->cur_code          =       ((this->prx_buffer[0] << 8) | (this->prx_buffer[1]));
-        this->cur_rpm               =       ((this->prx_buffer[2] << 8) | (this->prx_buffer[3])); 
-        this->cur_torque_I      =       ((this->prx_buffer[4] << 8) | (this->prx_buffer[5]));
-        this->cur_temperature   =       this->prx_buffer[6] ;  
-        this->cur_radians = this->trans_code_to_abspos_radians(this->cur_code);
-    }    
+    this->pre_code          =       this->cur_code;
+    this->cur_code          =       ((this->prx_buffer[0] << 8) | (this->prx_buffer[1]));
+    this->cur_rpm               =       ((this->prx_buffer[2] << 8) | (this->prx_buffer[3])); 
+    this->cur_torque_I      =       ((this->prx_buffer[4] << 8) | (this->prx_buffer[5]));
+    this->cur_temperature   =       this->prx_buffer[6] ; 
+    this->cur_radians = this->trans_code_to_abspos_radians();
+       
 }
 
 /**
@@ -400,17 +418,12 @@ void GMMotor::decode()
 void GMMotor::send_data()
 {
     this->cur_setting_voltage = CLAMP(this->cur_setting_voltage,this->Min_setting_voltage,this->Max_setting_voltage);
-    set_buffer(this->ptx_buffer,0,8);
     this->encode();
-    this->pcan->send_data(&this->tx_header,this->ptx_buffer);
+    this->pcan->send_data(&this->tx_header,GMMotor::pshared_tx_buffer);
 }
 
-void GMMotor::receive_data()
-{
-    set_buffer(this->prx_buffer,0,8);
-    this->pcan->receive_data(&this->rx_header,this->prx_buffer);
-    this->decode();
-}
+
+
 
 
 
@@ -444,6 +457,10 @@ void GMMotor::check_motor_state()
     {
         this->motor_flag = MOTOR_ERROR;
     }
+    if (this->cur_torque_I< this->Min_torque_I)
+    {
+        this->motor_flag = MOTOR_ERROR;
+    }
     if (this->cur_code > this->Max_code)
     {
         this->motor_flag = MOTOR_ERROR;
@@ -460,6 +477,7 @@ void GMMotor::check_motor_state()
     {
         this->motor_flag = MOTOR_ERROR;
     }
+
 
 
 }
@@ -508,12 +526,14 @@ void GMMotor::reset()
 void GMMotor::start()
 {
     this->reset(); 
-    this->target_radians = this->motor_start_radians;
+    this->target_radians = this->motor_start_radians; 
     return;
 }         
 
 
+//**********************************************GMMotor Static Value*********************************************** 
 
+uint8_t GMMotor::pshared_tx_buffer[GM_TX_BUFFER_LENGTH];
 
 
 

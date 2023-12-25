@@ -9,9 +9,10 @@
 //****************************************************Custom Define******************************************
 
 #define TOPIC_GIMBAL_CONTROL_LENGTH 16
-#define TOPIC_GIMBAL_POS_LENGTH 8
+#define TOPIC_GIMBAL_POS_LENGTH 10
 #define TOPIC_PRESENT_TIME_LENGTH 6
 #define TOPIC_URGENT_MSG_LENGTH 16
+#define TOPIC_MOTOR_DEBUG_INFO_LENGTH 7
 
 #define MAX_TOPIC_LENGTH 16
 
@@ -84,8 +85,8 @@ public:
 
 /**
  * buffer_size: uint8t * 16
- * NO.0 (relative_pitch.4:float , '<F')               |     (abs(x)<=1.5708)               |byte0-3    bytes 4     total 4
- * NO.1 (relative_yaw.4:float , '<F')                 |     (abs(x)<=3.1416)               |byte4-7    bytes 4     total 8
+ * NO.0 (target_pitch.4:float , '<F')               |     (abs(x)<=1.5708)               |byte0-3    bytes 4     total 4
+ * NO.1 (target_yaw.4:float , '<F')                 |     (abs(x)<=3.1416)               |byte4-7    bytes 4     total 8
  * NO.2 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                      |byte8      bytes 1     total 9
  * NO.3 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                     |byte9      bytes 1     total 10
  * NO.4 (reach_target_time_second_frac.4 , '<F')      |     (0<=x<=1)                      |byte10-13  bytes 4     total 14 
@@ -103,15 +104,15 @@ public:
     };
     ~TOPIC_Gimbal_Control(){};
     void encode(uint8_t* pbuffer, 
-                const float& relative_pitch, 
-                const float& relative_yaw,
+                const float& target_pitch, 
+                const float& target_yaw,
                 const uint8_t& reach_target_minute,
                 const uint8_t& reach_target_second,
                 const float& reach_target_second_frac,
                 const int16_t& setting_voltage_ro_rpm);
     void decode(uint8_t* pbuffer, 
-                float& relative_pitch, 
-                float& relative_yaw,
+                float& target_pitch, 
+                float& target_yaw,
                 uint8_t& reach_target_minute,
                 uint8_t& reach_target_second,
                 float& reach_target_second_frac,
@@ -122,9 +123,10 @@ public:
 
 
 /**
- *  buffer_size: uint8t * 8
+ *  buffer_size: uint8t * 10
  *  NO.0 (present_pitch.4:int , '<F')            |     (abs(x)<=1.5708)            |byte0-3    bytes 4     total 4
  *  NO.1 (present_yaw.4:int , '<F')              |     (abs(x)<=3.1416)            |byte4-7    bytes 4     total 8
+ *  NO.2 (present_debug_value(rpm|torque_I):int16|                                 |byte8-9    bytes 2     total 10
 */
 class TOPIC_Gimbal_Pos:public Topic
 {
@@ -137,10 +139,12 @@ public:
     ~TOPIC_Gimbal_Pos(){};
     void decode(uint8_t* pbuffer, 
                 float& present_pitch,
-                float& present_yaw);
+                float& present_yaw,
+                int16_t& present_debug_value);
     void encode(uint8_t* pbuffer, 
                 const float& present_pitch,
-                const float& present_yaw);
+                const float& present_yaw,
+                const int16_t& present_debug_value);
 };
 
 //***************************************************TOPIC: Urgent_Msg************************************************
@@ -166,6 +170,10 @@ public:
 };
 
 
+
+
+
+
 //**************************************************Global Value******************************************************
 
 
@@ -173,7 +181,6 @@ extern TOPIC_Gimbal_Control Global_Topic_gimbal_control;
 extern TOPIC_Gimbal_Pos Global_Topic_gimbal_pos;
 extern TOPIC_Present_Time Global_Topic_Present_time;
 extern TOPIC_Present_Time Global_Topic_Syn_time;
-
 
 
 //***********************************************************C API****************************************************************

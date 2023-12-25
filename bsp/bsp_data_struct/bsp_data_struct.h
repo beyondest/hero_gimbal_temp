@@ -26,8 +26,8 @@ typedef struct
 {
     char   sof                ;
     int8_t fire_times         ;
-    int16_t relative_pitch    ;
-    int16_t relative_yaw      ;
+    int16_t target_pitch    ;
+    int16_t target_yaw      ;
     uint8_t reach_minute      ;
     uint8_t reach_second      ;
     uint16_t reach_second_frac;
@@ -60,7 +60,8 @@ typedef struct
     uint16_t time_second_frac;
     int16_t present_pitch;
     int16_t present_yaw;
-    char null_3byte[3];
+    int16_t present_debug_value;
+    char null_byte;
     uint32_t crc_value;
 
 }POS_DATA;
@@ -81,7 +82,7 @@ typedef struct
 
 typedef struct 
 {
-    float relative_angle_radians;
+    float target_angle_radians;
     float cur_angle_radians;
     
 
@@ -96,11 +97,16 @@ typedef struct
     TIME_DATA cur_time;
     TIME_DATA target_time;
     int16_t setting_voltage_or_rpm;
+    int16_t present_debug_value;
+
+
+
 }GIMBAL_DATA;
 
 
 
 void copy(uint8_t* des_buffer, uint8_t* ori_buffer, uint32_t length);
+void update_copy(uint8_t* des_buffer, uint8_t* ori_buffer, uint32_t length);
 void set_buffer(uint8_t* des_buffer, uint8_t des_num,uint32_t length);
 void set_buffer32(uint32_t* des_buffer, uint32_t des_num, uint32_t length);
 

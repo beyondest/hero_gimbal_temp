@@ -27,6 +27,8 @@
 UART_HandleTypeDef huart7;
 UART_HandleTypeDef huart8;
 USART_HandleTypeDef husart6;
+USART_HandleTypeDef husart2;
+
 DMA_HandleTypeDef hdma_uart7_rx;
 DMA_HandleTypeDef hdma_uart7_tx;
 DMA_HandleTypeDef hdma_uart8_rx;
@@ -117,7 +119,29 @@ void MX_USART6_Init(void)
   /* USER CODE END USART6_Init 2 */
 
 }
+/*
 
+void MX_USART2_Init(void)
+{
+
+  husart2.Instance = USART2;
+  husart2.Init.BaudRate = USART2_BAUDRATE;
+  husart2.Init.WordLength = USART_WORDLENGTH_8B;
+  husart2.Init.StopBits = USART_STOPBITS_0_5;
+  husart2.Init.Parity = USART_PARITY_NONE;
+  husart2.Init.Mode = USART_MODE_TX_RX;
+  husart2.Init.CLKPolarity = USART_POLARITY_LOW;
+  husart2.Init.CLKPhase = USART_PHASE_1EDGE;
+  husart2.Init.CLKLastBit = USART_LASTBIT_DISABLE;
+  if (HAL_USART_Init(&husart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+
+}
+
+*/
 void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 

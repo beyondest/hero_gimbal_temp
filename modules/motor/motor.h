@@ -20,10 +20,17 @@
 #define YAW_MIN_CODE_VALUE 0
 #define YAW_MAX_SETTING_VOLTAGE 30000
 #define YAW_MIN_SETTING_VOLTAGE -30000
-#define YAW_MAX_RPM 100
-#define YAW_MIN_RPM -100
-#define YAW_MAX_TORQUE_I 10000
-#define YAW_MAX_TEMPERATURE 50
+
+#define YAW_MAX_TORQUE_I 3000
+#define YAW_MIN_TORQUE_I -3000
+#define YAW_MAX_TEMPERATURE 80
+
+#define YAW_MAX_RPM 150
+#define YAW_MIN_RPM -150
+#define YAW_RADIANS_MAX  MEGA
+#define YAW_RADIANS_MIN  (-MEGA)
+
+
 
 /*Pitch Init*/
 #define PITCH_MOTOR_ID 3
@@ -33,18 +40,24 @@
 #define PITCH_MIN_CODE_VALUE 0
 #define PITCH_MAX_SETTING_VOLTAGE 30000
 #define PITCH_MIN_SETTING_VOLTAGE -30000
-#define PITCH_MAX_RPM 100
-#define PITCH_MIN_RPM -100
-#define PITCH_MAX_TORQUE_I 10000
-#define PITCH_MAX_TEMPERATURE 50
+#define PITCH_MAX_TORQUE_I 3000
+#define PITCH_MIN_TORQUE_I -3000
+#define PITCH_MAX_TEMPERATURE 80
 
+#define PITCH_MAX_RPM 150
+#define PITCH_MIN_RPM -150
+#define PITCH_RADIANS_MAX MEGA
+#define PITCH_RADIANS_MIN (-MEGA)
 
 /* Total GM Init */
 
+#define GM_CODE_MUTATION_DETECT_INTERVAL_LENGTH 10 
 #define MAX_TORLERATE_RADIANS_ERROR_ABS 0.1
 #define GM_MOTOR_SHUTDOWN_VOLTAGE 0
 
 
+
+#define GM_SHARED_TX_BUFFER_LENGTH 8
 #define GM_TX_BUFFER_LENGTH 8
 #define GM_RX_BUFFER_LENGTH 8
 
@@ -101,7 +114,7 @@ private:
     uint8_t tx_buffer_length;
     
     uint8_t* prx_buffer;
-    uint8_t* ptx_buffer;
+    static uint8_t pshared_tx_buffer[]; 
 
 
 
@@ -114,7 +127,7 @@ private:
     };
     
     CAN_RxHeaderTypeDef rx_header = {
-        .StdId = 0,
+        .StdId = GM_CAN_FEEDBACK_ID_BASE,
         .IDE = GM_CAN_FRAME_IDE,
         .RTR = GM_CAN_FRAME_RTR,
         .DLC = GM_CAN_FRAME_DLC
@@ -129,13 +142,17 @@ private:
     int16_t Max_rpm;
     int16_t Min_rpm;
     int16_t Max_torque_I;
+    int16_t Min_torque_I;
     uint8_t Max_temperature;
 
     float motor_start_radians = 0;
-
+    uint16_t code_mutation_dectect_interval_length = GM_CODE_MUTATION_DETECT_INTERVAL_LENGTH;
 //Dynamic Value
 
+    int16_t round_count = 0;
+    uint16_t pre_code = 0;
     /* target value */
+
     float target_radians = 0;
     int16_t target_rpm = 0;
 
@@ -167,11 +184,10 @@ private:
 //private method
 
     /*      Communicate     */
-    float trans_code_to_abspos_radians(uint16_t code);
+    float trans_code_to_abspos_radians();
     void encode();
     void decode();
     void send_data();
-    void receive_data();
 
     /*      Inner method        */
     void check_motor_state();
@@ -203,7 +219,8 @@ public:
             uint16_t min_code,
             int16_t max_rpm,
             int16_t min_rpm,
-            int16_t max_torue_I,
+            int16_t max_torque_I,
+            int16_t min_torque_I,
             uint8_t max_temperature,
             Pid* pradians_pid,
             Pid* prpm_pid
@@ -248,7 +265,6 @@ public:
                 this->motor_flag = MOTOR_PREPARING;
             }*/ 
         }
-        
     }
 };
 

@@ -133,16 +133,15 @@ public:
         if (this->usart_data_wrong_count == MAX_USART_DATA_WRONG_COUNT && connect ==1 )
         {
             this->connect = 0;
-            while (1)
-            {
-                
-            }
+            
+        }
+        else if(this->usart_data_wrong_count == MAX_USART_DATA_WRONG_COUNT)
+        {
             
         }
         else
         {
             
-            return;
         }
     };
 

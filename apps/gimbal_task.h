@@ -53,6 +53,7 @@ private:
     void gimbal_pitch_control();
     void subscribe_gimbal_control();
     void subscribe_syn_time();
+    void publish_motor_debug_info();
     void publish_gimbal_pos();
     void publish_present_time();
 
@@ -79,7 +80,7 @@ public:
 //Run
 
     void run()override;
-    void debug_run();
+    void debug_rpm_run();
     void update_time_second();
 //Error Handler
     void send_to_center_error_handler()override

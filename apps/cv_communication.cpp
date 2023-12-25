@@ -25,8 +25,8 @@ void CV_Node::init_local_data()
 // Action Data   
     this->plocal_data.action_data.sof = 'A';
     this->plocal_data.action_data.fire_times = -1;
-    this->plocal_data.action_data.relative_pitch = 123;
-    this->plocal_data.action_data.relative_yaw = -3999;
+    this->plocal_data.action_data.target_pitch = 0;
+    this->plocal_data.action_data.target_yaw = 0;
     this->plocal_data.action_data.reach_minute = 21;
     this->plocal_data.action_data.reach_second = 21;
     this->plocal_data.action_data.reach_second_frac = 2100;
@@ -48,9 +48,8 @@ void CV_Node::init_local_data()
     this->plocal_data.pos_data.time_second_frac = 0;
     this->plocal_data.pos_data.present_pitch = 0;
     this->plocal_data.pos_data.present_yaw = 0;
-    this->plocal_data.pos_data.null_3byte[0] = '9';
-    this->plocal_data.pos_data.null_3byte[1] = '3';
-    this->plocal_data.pos_data.null_3byte[2] = '7';
+    this->plocal_data.pos_data.present_debug_value = 0;
+    this->plocal_data.pos_data.null_byte = '1';
     this->plocal_data.pos_data.crc_value = 0;
 
 }
@@ -111,8 +110,8 @@ void CV_Node::publish_gimbal_control()
 {
 
     Global_Topic_gimbal_control.encode( this->ptx_buffer,
-                                        trans_frac_float(this->plocal_data.action_data.relative_pitch),
-                                        trans_frac_float(this->plocal_data.action_data.relative_yaw),
+                                        trans_frac_float(this->plocal_data.action_data.target_pitch),
+                                        trans_frac_float(this->plocal_data.action_data.target_yaw),
                                         this->plocal_data.action_data.reach_minute,
                                         this->plocal_data.action_data.reach_second,
                                         trans_frac_float(this->plocal_data.action_data.reach_second_frac),
@@ -158,7 +157,8 @@ void CV_Node::feedback_pos_data()
  
         Global_Topic_gimbal_pos.decode( this->prx_buffer,
                                         this->tmp_cur_pitch,
-                                        this->tmp_cur_yaw
+                                        this->tmp_cur_yaw,
+                                        this->plocal_data.pos_data.present_debug_value
                                         );
         this->plocal_data.pos_data.present_pitch = trans_frac_int16(this->tmp_cur_pitch);
         this->plocal_data.pos_data.present_yaw = trans_frac_int16(this->tmp_cur_yaw);
@@ -167,6 +167,7 @@ void CV_Node::feedback_pos_data()
     {
         this->receive_from_center_error_handler();
     }
+
 
 //subscribe present time, Only CV_node need to trans_frac_uint16 here
     if ((this->feedback_present_time = this->receive_msg_from_center(&Global_Topic_Present_time)) == SEND_SUCCESS)
@@ -258,8 +259,8 @@ DATA_STATE CV_Node::cv_encode_to_uart()
  * buffer_size: uint8t * 16
  * NO.0 (SOF:char , '<c')                             |     ('A')                      |byte0      bytes 1     total 1
  * NO.1 (fire_times:int , '<b')                       |     (-1<=x<=100)               |byte1      bytes 1     total 2 (-1:not control;0:control not fire) 
- * NO.2 (relative_pitch.4*10000:int , '<h')           |     (abs(x)<=15708)            |byte2-3    bytes 2     total 4
- * NO.3 (relative_yaw.4*10000:int , '<h')             |     (abs(x)<=31416)            |byte4-5    bytes 2     total 6
+ * NO.2 (target_pitch.4*10000:int , '<h')           |     (abs(x)<=15708)            |byte2-3    bytes 2     total 4
+ * NO.3 (target_yaw.4*10000:int , '<h')             |     (abs(x)<=31416)            |byte4-5    bytes 2     total 6
  * NO.4 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                  |byte6      bytes 1     total 7
  * NO.5 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                 |byte7      bytes 1     total 8
  * NO.6 (reach_target_time_second_frac.4*10000 , '<H')|     (0<=x<=10000)              |byte8-9    bytes 2     total 10 
@@ -271,8 +272,8 @@ void CV_Node::receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
 {
   pout->sof                 = prx_data[0];
   pout->fire_times          = prx_data[1];
-  pout->relative_pitch      = *((int16_t*) &prx_data[2]);
-  pout->relative_yaw        = *((int16_t*) &prx_data[4]);
+  pout->target_pitch      = *((int16_t*) &prx_data[2]);
+  pout->target_yaw        = *((int16_t*) &prx_data[4]);
   pout->reach_minute        = prx_data[6];
   pout->reach_second        = prx_data[7];
   pout->reach_second_frac   = *((uint16_t*) &prx_data[8]);
@@ -317,8 +318,9 @@ void CV_Node::receive_syn_to_data(uint8_t *prx_data,SYN_DATA* pout)
  *  NO.3 (present_time_second_frac.4*10000:int, '<H')  |     (0<=x<=10000)              |byte3-4    bytes 2     total 5
  *  NO.4 (present_pitch.4*10000:int , '<h')            |     (abs(x)<=15708)            |byte5-6    bytes 2     total 7
  *  NO.5 (present_yaw.4*10000:int , '<h')              |     (abs(x)<=31416)            |byte7-8    bytes 2     total 9
- *  NO.678 (null_byte:b'123','<c','<c','<c')           |                                |byte9-11   bytes 3     total 12
- *  NO.9 (crc_value:int , '<I')                        |     (return of cal_crc func)   |byte12-15  bytes 4     total 16
+ *  NO.6 (present_debug_value:rpm or torque I,'<h')    |                                |byte9-10   bytes 2     total 11
+ *  NO.7 (nullbyte: char='1','<c')                     |                                |byte11     bytes 1     total 12
+ *  NO.8 (crc_value:int , '<I')                        |     (return of cal_crc func)   |byte12-15  bytes 4     total 16
  *  PART_CRC: byte5-8
  * 
  * 
@@ -344,9 +346,10 @@ void CV_Node::save_pos_data_to_buffer(POS_DATA* pdata_to_send,uint8_t* ptx_buffe
     pi16 = (int16_t*)&ptx_buffer[7];
     *pi16 = pdata_to_send->present_yaw;
 
-    ptx_buffer[9] = pdata_to_send->null_3byte[0];
-    ptx_buffer[10] = pdata_to_send->null_3byte[1];
-    ptx_buffer[11] = pdata_to_send->null_3byte[2];
+    pi16 = (int16_t*)&ptx_buffer[9];
+    *pi16 = pdata_to_send->present_debug_value;
+   
+    ptx_buffer[11] = pdata_to_send->null_byte;
 
 
 

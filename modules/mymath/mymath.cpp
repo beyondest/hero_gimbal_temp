@@ -1,5 +1,5 @@
 #include "mymath.h"
-
+#include "motor.h"
 
 
 
@@ -19,8 +19,8 @@ Pid Global_pitch_radians_pid( PITCH_RADIANS_PID_KP,
                               PITCH_RADIANS_MIN,
                               PITCH_RADIANS_MAX,
                               PITCH_RADIANS_MIN,
-                              PITCH_RPM_MAX,
-                              PITCH_RPM_MIN
+                              PITCH_MAX_RPM,
+                              PITCH_MIN_RPM
                               );
 
 
@@ -33,10 +33,10 @@ Pid Global_pitch_rpm_pid( PITCH_RPM_KP,
                           PITCH_RPM_MIN_I,
                           PITCH_RPM_MAX_D,
                           PITCH_RPM_MIN_D,
-                          PITCH_RPM_MAX,
-                          PITCH_RPM_MIN,
-                          PITCH_RPM_MAX,
-                          PITCH_RPM_MIN,
+                          PITCH_MAX_RPM,
+                          PITCH_MIN_RPM,
+                          PITCH_MAX_RPM,
+                          PITCH_MIN_RPM,
                           PITCH_MAX_SETTING_VOLTAGE,
                           PITCH_MIN_SETTING_VOLTAGE
                           );
@@ -58,8 +58,8 @@ Pid Global_yaw_radians_pid(   YAW_RADIANS_PID_KP,
                               YAW_RADIANS_MIN,
                               YAW_RADIANS_MAX,
                               YAW_RADIANS_MIN,
-                              YAW_RPM_MAX,
-                              YAW_RPM_MIN
+                              YAW_MAX_RPM,
+                              YAW_MIN_RPM
                               );
 
                               
@@ -72,10 +72,10 @@ Pid Global_yaw_rpm_pid(   YAW_RPM_KP,
                           YAW_RPM_MIN_I,
                           YAW_RPM_MAX_D,
                           YAW_RPM_MIN_D,
-                          YAW_RPM_MAX,
-                          YAW_RPM_MIN,
-                          YAW_RPM_MAX,
-                          YAW_RPM_MIN,
+                          YAW_MAX_RPM,
+                          YAW_MIN_RPM,
+                          YAW_MAX_RPM,
+                          YAW_MIN_RPM,
                           YAW_MAX_SETTING_VOLTAGE,
                           YAW_MIN_SETTING_VOLTAGE
                           );

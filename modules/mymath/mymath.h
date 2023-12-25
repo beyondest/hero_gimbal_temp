@@ -8,26 +8,12 @@
 //*******************************************************Custom Define**********************************************
 
 
-#define PITCH_RADIANS_MAX 1.5708
-#define PITCH_RADIANS_MIN -1.5708
-#define PITCH_RPM_MAX     1000
-#define PITCH_RPM_MIN     -1000
-#define PITCH_MAX_SETTING_VOLTAGE 30000
-#define PITCH_MIN_SETTING_VOLTAGE -30000
-
-
-
-#define YAW_RADIANS_MAX  3.1416
-#define YAW_RADIANS_MIN  -3.1416
-#define YAW_RPM_MAX      1000
-#define YAW_RPM_MIN      -1000
-#define YAW_MAX_SETTING_VOLTAGE 30000
-#define YAW_MIN_SETTING_VOLTAGE -30000
 
 
 
 
-#define PITCH_RADIANS_PID_KP 40
+
+#define PITCH_RADIANS_PID_KP 100
 #define PITCH_RADIANS_PID_KI  3
 #define PITCH_RADIANS_PID_KD  1
 #define PITCH_RADIANS_PID_MAX_P 10000
@@ -40,7 +26,7 @@
 
 #define PITCH_RPM_KP 40
 #define PITCH_RPM_KI  3
-#define PITCH_RPM_KD  1
+#define PITCH_RPM_KD  0
 #define PITCH_RPM_MAX_P 10000
 #define PITCH_RPM_MIN_P -10000
 #define PITCH_RPM_MAX_I 10000
@@ -50,7 +36,7 @@
 
 
 
-#define YAW_RADIANS_PID_KP 40
+#define YAW_RADIANS_PID_KP 100
 #define YAW_RADIANS_PID_KI  3
 #define YAW_RADIANS_PID_KD  1
 #define YAW_RADIANS_PID_MAX_P 10000
@@ -63,7 +49,7 @@
 
 #define YAW_RPM_KP 40
 #define YAW_RPM_KI  3
-#define YAW_RPM_KD  1
+#define YAW_RPM_KD  0
 #define YAW_RPM_MAX_P 10000
 #define YAW_RPM_MIN_P -10000
 #define YAW_RPM_MAX_I 10000

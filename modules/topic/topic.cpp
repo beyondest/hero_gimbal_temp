@@ -26,8 +26,8 @@ TOPIC_Present_Time Global_Topic_Syn_time('S');
 //***********************************************TOPIC: Gimbal_Control***************************************************************
 
 void TOPIC_Gimbal_Control::encode(uint8_t* pbuffer, 
-                                const float& relative_pitch, 
-                                const float& relative_yaw,
+                                const float& target_pitch, 
+                                const float& target_yaw,
                                 const uint8_t& reach_target_minute,
                                 const uint8_t& reach_target_second,
                                 const float& reach_target_second_frac,
@@ -36,9 +36,9 @@ void TOPIC_Gimbal_Control::encode(uint8_t* pbuffer,
     float* pf;
     int16_t* pi;
     pf = (float*)&pbuffer[0];
-    *pf = relative_pitch;
+    *pf = target_pitch;
     pf = (float*)&pbuffer[4];
-    *pf = relative_yaw;
+    *pf = target_yaw;
 
     pbuffer[8] = reach_target_minute;
     pbuffer[9] = reach_target_second;
@@ -52,8 +52,8 @@ void TOPIC_Gimbal_Control::encode(uint8_t* pbuffer,
 }
 
 void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer, 
-                                float& relative_pitch, 
-                                float& relative_yaw,
+                                float& target_pitch, 
+                                float& target_yaw,
                                 uint8_t& reach_target_minute,
                                 uint8_t& reach_target_second,
                                 float& reach_target_second_frac,
@@ -62,9 +62,9 @@ void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer,
     float* pf;
     int16_t* pi;
     pf = (float*)&pbuffer[0];
-    relative_pitch=*pf;
+    target_pitch=*pf;
     pf = (float*)&pbuffer[4];
-    relative_yaw=*pf;
+    target_yaw=*pf;
 
     reach_target_minute=pbuffer[8];
     reach_target_second= pbuffer[9];
@@ -83,20 +83,26 @@ void TOPIC_Gimbal_Control::decode(uint8_t* pbuffer,
 
 void TOPIC_Gimbal_Pos::decode(uint8_t* pbuffer, 
                               float& present_pitch,
-                              float& present_yaw)
+                              float& present_yaw,
+                              int16_t& present_debug_value)
 {
     present_pitch = *(float*)&pbuffer[0];
     present_yaw = *(float*)&pbuffer[4];
+    present_debug_value = *(int16_t*)&pbuffer[8];
 }
 void TOPIC_Gimbal_Pos::encode(uint8_t* pbuffer, 
                             const float& present_pitch,
-                            const float& present_yaw)
+                            const float& present_yaw,
+                            const int16_t& present_debug_value)
 {
     float* pf;
+    int16_t* pint16;
     pf = (float*)&pbuffer[0];
     *pf = present_pitch;
     pf =(float*)&pbuffer[4];
     *pf = present_yaw;
+    pint16 = (int16_t*)&pbuffer[8];
+    *pint16 = present_debug_value;
 }
 
 //***********************************************TOPIC: Present_Time***************************************************************
@@ -138,6 +144,7 @@ void TOPIC_Urgent_Msg::encode(uint8_t* pbuffer, const uint8_t& node_flag,const N
     *pbuffer = node_flag;
     pbuffer[1] = (uint8_t)node_state;
 }
+
 
 
 
