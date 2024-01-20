@@ -39,8 +39,8 @@ void CV_Node::init_local_data()
 
     this->plocal_data.action_data.sof = 'A';
     this->plocal_data.action_data.fire_times = -1;
-    this->plocal_data.action_data.target_pitch = 0;
-    this->plocal_data.action_data.target_yaw = 0;
+    this->plocal_data.action_data.relative_pitch = 0;
+    this->plocal_data.action_data.relative_yaw = 0;
     this->plocal_data.action_data.reach_minute = 21;
     this->plocal_data.action_data.reach_second = 21;
     this->plocal_data.action_data.reach_second_frac = 2100;
@@ -131,8 +131,8 @@ void CV_Node::publish_gimbal_control()
 {
 
     Global_Topic_gimbal_control.encode( this->ptx_buffer,
-                                        trans_frac_float(this->plocal_data.action_data.target_pitch),
-                                        trans_frac_float(this->plocal_data.action_data.target_yaw),
+                                        trans_frac_float(this->plocal_data.action_data.relative_pitch),
+                                        trans_frac_float(this->plocal_data.action_data.relative_yaw),
                                         this->plocal_data.action_data.reach_minute,
                                         this->plocal_data.action_data.reach_second,
                                         trans_frac_float(this->plocal_data.action_data.reach_second_frac),
@@ -280,8 +280,8 @@ DATA_STATE CV_Node::cv_encode_to_uart()
  * buffer_size: uint8t * 16
  * NO.0 (SOF:char , '<c')                             |     ('A')                      |byte0      bytes 1     total 1
  * NO.1 (fire_times:int , '<b')                       |     (-1<=x<=100)               |byte1      bytes 1     total 2 (-1:not control;0:control not fire) 
- * NO.2 (target_pitch.4*10000:int , '<h')           |     (abs(x)<=15708)            |byte2-3    bytes 2     total 4
- * NO.3 (target_yaw.4*10000:int , '<h')             |     (abs(x)<=31416)            |byte4-5    bytes 2     total 6
+ * NO.2 (relative_pitch.4*10000:int , '<h')           |     (abs(x)<=15708)            |byte2-3    bytes 2     total 4
+ * NO.3 (relative_yaw.4*10000:int , '<h')             |     (abs(x)<=31416)            |byte4-5    bytes 2     total 6
  * NO.4 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                  |byte6      bytes 1     total 7
  * NO.5 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                 |byte7      bytes 1     total 8
  * NO.6 (reach_target_time_second_frac.4*10000 , '<H')|     (0<=x<=10000)              |byte8-9    bytes 2     total 10 
@@ -293,8 +293,8 @@ void CV_Node::receive_action_to_data(uint8_t *prx_data ,ACTION_DATA* pout)
 {
   pout->sof                 = prx_data[0];
   pout->fire_times          = prx_data[1];
-  pout->target_pitch      = *((int16_t*) &prx_data[2]);
-  pout->target_yaw        = *((int16_t*) &prx_data[4]);
+  pout->relative_pitch      = *((int16_t*) &prx_data[2]);
+  pout->relative_yaw        = *((int16_t*) &prx_data[4]);
   pout->reach_minute        = prx_data[6];
   pout->reach_second        = prx_data[7];
   pout->reach_second_frac   = *((uint16_t*) &prx_data[8]);

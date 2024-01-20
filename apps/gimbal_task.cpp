@@ -48,10 +48,10 @@ void Gimbal_Node::init_local_data()
 
 
     this->plocal_data.pitch_motor_data.cur_angle_radians =0.2618;
-    this->plocal_data.pitch_motor_data.target_angle_radians = 0;
+    this->plocal_data.pitch_motor_data.relative_angle_radians = 0;
 
     this->plocal_data.yaw_motor_data.cur_angle_radians = -0.2618;
-    this->plocal_data.yaw_motor_data.target_angle_radians = 0;
+    this->plocal_data.yaw_motor_data.relative_angle_radians = 0;
 
     this->plocal_data.setting_voltage_or_rpm = 10;
 
@@ -123,8 +123,8 @@ void Gimbal_Node::subscribe_gimbal_control()
     if ((this->feedback_gimbal_control = this->receive_msg_from_center(&Global_Topic_gimbal_control)) == SEND_SUCCESS)
     {
         Global_Topic_gimbal_control.decode(this->prx_buffer,
-                                           this->plocal_data.pitch_motor_data.target_angle_radians,
-                                           this->plocal_data.yaw_motor_data.target_angle_radians,
+                                           this->plocal_data.pitch_motor_data.relative_angle_radians,
+                                           this->plocal_data.yaw_motor_data.relative_angle_radians,
                                            this->plocal_data.target_time.minute,
                                            this->plocal_data.target_time.second,
                                            this->plocal_data.target_time.second_frac_4,
@@ -190,7 +190,7 @@ void Gimbal_Node::publish_present_time()
 void Gimbal_Node::gimbal_pitch_control()
 {
     this->ppitch_motor->debug_flag = NO_DEBUG;
-    if (this->ppitch_motor->to_radians( this->plocal_data.pitch_motor_data.target_angle_radians,
+    if (this->ppitch_motor->to_radians( this->plocal_data.pitch_motor_data.relative_angle_radians +this->plocal_data.pitch_motor_data.cur_angle_radians,
                                         this->plocal_data.target_time.minute,
                                         this->plocal_data.target_time.second,
                                         this->plocal_data.target_time.second_frac_4) != ACTION_SUCESS)
@@ -208,7 +208,7 @@ void Gimbal_Node::gimbal_pitch_control()
 void Gimbal_Node::gimbal_yaw_control()
 {
     this->pyaw_motor->debug_flag = NO_DEBUG;
-    if (this->pyaw_motor->to_radians(   this->plocal_data.yaw_motor_data.target_angle_radians,
+    if (this->pyaw_motor->to_radians(   this->plocal_data.yaw_motor_data.relative_angle_radians+this->plocal_data.yaw_motor_data.cur_angle_radians,
                                         this->plocal_data.target_time.minute,
                                         this->plocal_data.target_time.second,
                                         this->plocal_data.target_time.second_frac_4) != ACTION_SUCESS)

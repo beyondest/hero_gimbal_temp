@@ -26,8 +26,8 @@ typedef struct
 {
     char   sof                ;
     int8_t fire_times         ;
-    int16_t target_pitch    ;
-    int16_t target_yaw      ;
+    int16_t relative_pitch    ;
+    int16_t relative_yaw      ;
     uint8_t reach_minute      ;
     uint8_t reach_second      ;
     uint16_t reach_second_frac;
@@ -82,7 +82,7 @@ typedef struct
 
 typedef struct 
 {
-    float target_angle_radians;
+    float relative_angle_radians;
     float cur_angle_radians;
     
 

@@ -85,8 +85,8 @@ public:
 
 /**
  * buffer_size: uint8t * 16
- * NO.0 (target_pitch.4:float , '<F')               |     (abs(x)<=1.5708)               |byte0-3    bytes 4     total 4
- * NO.1 (target_yaw.4:float , '<F')                 |     (abs(x)<=3.1416)               |byte4-7    bytes 4     total 8
+ * NO.0 (relative_pitch.4:float , '<F')               |     (abs(x)<=1.5708)               |byte0-3    bytes 4     total 4
+ * NO.1 (relative_yaw.4:float , '<F')                 |     (abs(x)<=3.1416)               |byte4-7    bytes 4     total 8
  * NO.2 (reach_target_time_minute:int , '<B')         |     (0<=x<60)                      |byte8      bytes 1     total 9
  * NO.3 (reach_target_time_second:int , '<B')         |     (0<=x<=60)                     |byte9      bytes 1     total 10
  * NO.4 (reach_target_time_second_frac.4 , '<F')      |     (0<=x<=1)                      |byte10-13  bytes 4     total 14 
@@ -104,16 +104,16 @@ public:
     };
     ~TOPIC_Gimbal_Control(){};
     void encode(uint8_t* pbuffer, 
-                const float& target_pitch, 
-                const float& target_yaw,
+                const float& relative_pitch, 
+                const float& relative_yaw,
                 const uint8_t& reach_target_minute,
                 const uint8_t& reach_target_second,
                 const float& reach_target_second_frac,
                 const int16_t& setting_voltage_ro_rpm);
                 
     void decode(uint8_t* pbuffer, 
-                float& target_pitch, 
-                float& target_yaw,
+                float& relative_pitch, 
+                float& relative_yaw,
                 uint8_t& reach_target_minute,
                 uint8_t& reach_target_second,
                 float& reach_target_second_frac,
