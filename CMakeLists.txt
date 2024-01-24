@@ -40,6 +40,7 @@ set(lib_list)
 set(inc_list)
 set(header_list)
 file(GLOB_RECURSE libsrc_list ${ROOT_DIR}/libsrc/*.c)
+
 file(GLOB_RECURSE src_list ${ROOT_DIR}/Core/Src/*.c
                            ${ROOT_DIR}/Core/Src/*.cpp
                            ${ROOT_DIR}/bsp/*.c
@@ -51,6 +52,7 @@ file(GLOB_RECURSE src_list ${ROOT_DIR}/Core/Src/*.c
                            #${ROOT_DIR}/Drivers/CMSIS/DSP/Source/*.c
                            #${ROOT_DIR}/Drivers/CMSIS/DSP/Source/*.cpp
                            )
+
 file(GLOB_RECURSE header_list ${ROOT_DIR}/Core/Inc/*.h
                               ${ROOT_DIR}/bsp/*.h
                               ${ROOT_DIR}/modules/*.h
@@ -143,7 +145,6 @@ else ()
     add_compile_options(-Og -g -gdwarf-2)
     add_definitions(-DESC_DEBUG) # ESC Debug
 endif ()
-
 
 
 add_executable(${myapp_name}.elf ${src_list} ${asm_list})

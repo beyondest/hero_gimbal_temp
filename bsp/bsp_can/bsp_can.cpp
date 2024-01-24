@@ -45,7 +45,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     if (hcan == &hcan1)
     {
         Global_can1.rx_fifo_msg_pending_callback();
-        Global_pitch_motor.get_feedback();
         Global_yaw_motor.get_feedback();
 
     }
@@ -71,6 +70,8 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
     if (hcan == &hcan2)
     {
         Global_can2.rx_fifo_msg_pending_callback();
+        Global_pitch_motor.get_feedback();
+
     }
 }
 

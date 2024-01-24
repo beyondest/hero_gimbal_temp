@@ -144,14 +144,20 @@ int main(void)
 
   Global_usart8.set_rx_callback(led2_blink);
 
+
   Global_can1.set_tx_callback(led3_blink);
   Global_can1.add_rx_callback(led4_blink);
-  Global_can1.add_rx_callback(pitch_control);
   Global_can1.add_rx_callback(yaw_control);
+
+
+  Global_can2.set_tx_callback(led5_blink);
+  Global_can2.add_rx_callback(led7_blink);
+  Global_can2.add_rx_callback(pitch_control);
 
 
   Global_usart8.start();
   Global_can1.start();
+  Global_can2.start();
 
 
   Global_tim1.start_task();

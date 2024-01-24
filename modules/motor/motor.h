@@ -13,8 +13,8 @@
 
 /* Yaw Init */
 
-#define YAW_MOTOR_ID 2
-#define YAW_CODE_ZERO_OFFSET 7000
+#define YAW_MOTOR_ID 1
+#define YAW_CODE_ZERO_OFFSET 600
 
 
 #define YAW_MAX_CODE_VALUE 8192
@@ -34,8 +34,9 @@
 
 
 /*Pitch Init*/
-#define PITCH_MOTOR_ID 4
-#define PITCH_CODE_ZERO_OFFSET 4700
+
+#define PITCH_MOTOR_ID 1
+#define PITCH_CODE_ZERO_OFFSET 500
 
 #define PITCH_MAX_CODE_VALUE 8192
 #define PITCH_MIN_CODE_VALUE 0

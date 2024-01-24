@@ -240,7 +240,7 @@ void Error_Handler(void);
 #define GLOBAL_CAN_FILTER_SCALE CAN_FILTERSCALE_16BIT
 
 //this is GM possible ID    1    2     3     4     5     6     7
-// CAN1_ID_YOU_WANT "0x205 0x206 0x207 0x208 0x209 0x20a 0x20b"
+// CAN1_ID_YOU_WANT      "0x205 0x206 0x207 0x208 0x209 0x20a 0x20b"
 #define CAN1_MASK_ID   0x7f0
 #define CAN1_FILTER_ID  0x200
 #define CAN1_IT_TYPE CAN_IT_RX_FIFO0_MSG_PENDING

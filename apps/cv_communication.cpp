@@ -1,6 +1,6 @@
 #include "cv_communication.h"
 #include "bsp_usart.h"
-
+#include "bsp_led.h"
 
 //*********************************************************Global Value**********************************************
 CV_Node Global_cv_node(
@@ -95,14 +95,13 @@ void CV_Node::run()
     case DATA_STATE_ACTION:
         this->connect = 1;
         this->usart_data_wrong_count = 0;
-        HAL_GPIO_TogglePin(LED8_GPIO_Port,LED8_Pin);
+        led8_blink();
         this->publish_gimbal_control();
         break;
 
     case DATA_STATE_SYN:
         this->connect = 1;
         this->usart_data_wrong_count = 0;
-        HAL_GPIO_TogglePin(LED7_GPIO_Port,LED7_Pin);
         this->publish_syn_data();
 
         break;

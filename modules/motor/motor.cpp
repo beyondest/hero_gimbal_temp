@@ -6,7 +6,7 @@ GMMotor Global_pitch_motor(/*  Fixed Value  */
                            PITCH_CODE_ZERO_OFFSET,
                            GM_RX_BUFFER_LENGTH,
                            GM_TX_BUFFER_LENGTH,
-                           &Global_can1,
+                           &Global_can2,
                            /*  Safe Status Init  */
                            PITCH_MAX_SETTING_VOLTAGE,
                            PITCH_MIN_SETTING_VOLTAGE,
